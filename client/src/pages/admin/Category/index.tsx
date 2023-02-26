@@ -4,14 +4,13 @@ import { Card } from "@/components/common";
 import CategoryForm from "./components/CategoryForm";
 import CategoryTable from "./components/CategoryTable";
 
-// import useLoading from "@/hooks/useLoading";
 import useCategories from "@/hooks/queries/useCategories";
 
 const Category = () => {
     const { data, isFetching, error } = useCategories();
 
     if (error) {
-        return <Typography>`Something went wrong!!!`</Typography>;
+        return <Typography>Something went wrong!!!</Typography>;
     }
 
     return (
