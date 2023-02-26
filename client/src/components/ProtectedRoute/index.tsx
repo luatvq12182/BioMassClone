@@ -8,10 +8,10 @@ type Props = {
 };
 
 const ProtectedRoute = ({ children }: Props) => {
-    const user = useAuth();
+    const { user } = useAuth();
 
     if (!user) {
-        return <Navigate to='/sign-in' />;
+        return <Navigate to={`/sign-in`} />;
     }
 
     return <Box>{children}</Box>;

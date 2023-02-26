@@ -18,12 +18,14 @@ import {
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 
+import useAuth from "@/hooks/useAuth";
 import navigations from "@/configs/admin-navigation";
 
 export default function Header() {
     const navigate = useNavigate();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
+    const { signOut } = useAuth();
 
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -33,11 +35,22 @@ export default function Header() {
         setAnchorEl(null);
     };
 
+    const handleSignOut = () => {
+        signOut(() => {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("user");
+        });
+    };
+
     const renderMenuItems = () => (
         <Box
             role='presentation'
-            onClick={() => { setIsOpenDrawer(!isOpenDrawer) }}
-            onKeyDown={() => { setIsOpenDrawer(!isOpenDrawer) }}
+            onClick={() => {
+                setIsOpenDrawer(!isOpenDrawer);
+            }}
+            onKeyDown={() => {
+                setIsOpenDrawer(!isOpenDrawer);
+            }}
             sx={{
                 width: 250,
             }}
@@ -113,7 +126,9 @@ export default function Header() {
                             onClose={handleClose}
                         >
                             <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleClose}>Logout</MenuItem>
+                            <MenuItem onClick={handleSignOut}>
+                                Sign Out
+                            </MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>
@@ -123,7 +138,7 @@ export default function Header() {
                 anchor={"left"}
                 open={isOpenDrawer}
                 onClose={() => {
-                    setIsOpenDrawer(!isOpenDrawer)
+                    setIsOpenDrawer(!isOpenDrawer);
                 }}
             >
                 {renderMenuItems()}

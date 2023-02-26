@@ -12,7 +12,7 @@ import "./index.css";
 
 import App from "./App";
 import theme from "./configs/theme";
-import { LoadingProvider } from "@/contexts/Loading";
+import { AuthProvider } from "./contexts/Auth";
 
 const queryClient = new QueryClient();
 
@@ -22,9 +22,9 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
             <CssBaseline />
 
             <QueryClientProvider client={queryClient}>
-                <LoadingProvider>
+                <AuthProvider>
                     <App />
-                </LoadingProvider>
+                </AuthProvider>
             </QueryClientProvider>
         </ThemeProvider>
     </React.StrictMode>

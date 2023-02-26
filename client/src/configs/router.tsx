@@ -9,8 +9,9 @@ import {
     ContactList,
     CreateArticle,
     EditArticle,
+    FileManager,
 } from "@/pages/admin";
-import Login from "@/pages/admin/Login";
+import SignIn from "@/pages/admin/SignIn";
 import { Article, Contact, Home } from "@/pages/client";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -51,7 +52,11 @@ const router = createBrowserRouter([
         children: [
             {
                 path: "dashboard",
-                element: <div>Dashboard</div>,
+                element: <h1>Hello, Leo Yeager</h1>,
+            },
+            {
+                path: "file-manager",
+                element: <FileManager />
             },
             {
                 path: "article",
@@ -85,7 +90,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/sign-in",
-        element: <Login />,
+        element: <SignIn />,
     },
 ]);
 

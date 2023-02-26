@@ -1,11 +1,8 @@
-const useAuth = () => {
-    const user = {
-        username: "Lmao",
-        email: "Lmao",
-        token: "abc xyz",
-    };
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/Auth";
 
-    return user;
+const useAuth = () => {
+    return useContext(AuthContext);
 };
 
 export default useAuth;

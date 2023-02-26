@@ -4,17 +4,18 @@ import { useForm } from "react-hook-form";
 import { Box, Checkbox, FormControlLabel, FormGroup } from "@mui/material";
 
 import useAuth from "@/hooks/useAuth";
-import useLoading from "@/hooks/useLoading";
 import * as UserService from "@/services/user";
 import { Button, Card, Input } from "@/components/common";
+import { setAuthorizationHeader } from "@/services/httpClient";
 
 type FormProps = {
-    username: string;
+    email: string;
     password: string;
 };
 
-const Login = () => {
-    const user = useAuth();
+const SignIn = () => {
+    const { user, signIn } = useAuth();
+    const [isSubmiting, setIsSubmiting] = useState<boolean>(false);
 
     const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
     const {
@@ -22,26 +23,27 @@ const Login = () => {
         handleSubmit,
         formState: { errors },
     } = useForm<FormProps>();
-    const { showLoading, hideLoading } = useLoading();
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setIsShowPassword(e.target.checked);
     };
 
     const submitHandler = async (data: FormProps) => {
-        showLoading();
-
+        setIsSubmiting(true);
         try {
             const res = await UserService.signin(data);
 
-            console.log(res);
-        } catch (error) {
-            console.log("ERROR:: ", error);
-        }
+            setAuthorizationHeader(res.data.accessToken);
 
-        setTimeout(() => {
-            hideLoading();
-        }, 1500);
+            signIn(res.data.user.username, () => {
+                localStorage.setItem("accessToken", res.data.accessToken);
+                localStorage.setItem("user", JSON.stringify(res.data.user));
+            });
+        } catch (error: any) {
+            console.log("ERROR:: ", error);
+            window.alert(error.response.data);
+        }
+        setIsSubmiting(false);
     };
 
     if (user) {
@@ -73,10 +75,10 @@ const Login = () => {
                     onSubmit={handleSubmit(submitHandler)}
                 >
                     <Input
-                        error={!!errors["username"]}
-                        label='Username'
+                        error={!!errors["email"]}
+                        label='Email'
                         sx={{ mb: 2 }}
-                        {...register("username", {
+                        {...register("email", {
                             required: true,
                         })}
                     />
@@ -103,6 +105,7 @@ const Login = () => {
 
                     <Button
                         fullWidth
+                        loading={isSubmiting}
                         size='large'
                         type='submit'
                     >
@@ -114,4 +117,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default SignIn;
