@@ -11,6 +11,7 @@ using server.DataAccess.EF;
 namespace server.Migrations
 {
     [DbContext(typeof(GreenWayDbContext))]
+
     [Migration("20230307143421_Inital")]
     partial class Inital
     {
