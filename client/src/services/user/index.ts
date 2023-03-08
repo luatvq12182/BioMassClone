@@ -1,7 +1,7 @@
 import httpClient from "../httpClient";
 
-const signin = (payload: { email: string; password: string }) => {
-    return httpClient.post("/signin", payload);
+const signin = (payload: { username: string; password: string }) => {
+    return httpClient.post("/auth/login", payload);
 };
 
 export { signin };

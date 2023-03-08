@@ -9,7 +9,7 @@ import { Button, Card, Input } from "@/components/common";
 import { setAuthorizationHeader } from "@/services/httpClient";
 
 type FormProps = {
-    email: string;
+    username: string;
     password: string;
 };
 
@@ -32,16 +32,17 @@ const SignIn = () => {
         setIsSubmiting(true);
         try {
             const res = await UserService.signin(data);
+            console.log(res.data);
 
-            setAuthorizationHeader(res.data.accessToken);
+            setAuthorizationHeader(res.data.token);
 
-            signIn(res.data.user.username, () => {
-                localStorage.setItem("accessToken", res.data.accessToken);
-                localStorage.setItem("user", JSON.stringify(res.data.user));
+            signIn(res.data.userName, () => {
+                localStorage.setItem("accessToken", res.data.token);
+                localStorage.setItem("user", JSON.stringify(res.data.userName));
             });
         } catch (error: any) {
             console.log("ERROR:: ", error);
-            window.alert(error.response.data);
+            window.alert(error.response);
         }
         setIsSubmiting(false);
     };
@@ -75,10 +76,10 @@ const SignIn = () => {
                     onSubmit={handleSubmit(submitHandler)}
                 >
                     <Input
-                        error={!!errors["email"]}
+                        error={!!errors["username"]}
                         label='Email'
                         sx={{ mb: 2 }}
-                        {...register("email", {
+                        {...register("username", {
                             required: true,
                         })}
                     />
