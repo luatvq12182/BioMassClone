@@ -3,9 +3,9 @@ using server.DataAccess.Entities;
 
 namespace server.DataAccess.EF
 {
-    public class BioMassDbContext : DbContext
+    public class GreenWayDbContext : DbContext
     {
-        public BioMassDbContext(DbContextOptions opt) : base(opt) 
+        public GreenWayDbContext(DbContextOptions opt) : base(opt) 
         {
 
         }

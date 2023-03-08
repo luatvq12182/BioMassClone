@@ -11,8 +11,8 @@ using server.DataAccess.EF;
 namespace server.Migrations
 {
     [DbContext(typeof(GreenWayDbContext))]
-    [Migration("20230307143421_Inital")]
-    partial class Inital
+    [Migration("20230308100954_add-UserName-Column")]
+    partial class addUserNameColumn
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -60,6 +60,8 @@ namespace server.Migrations
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("LanguageId");
+
                     b.ToTable("CatLangs");
                 });
 
@@ -77,16 +79,11 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PostId");
 
                     b.ToTable("Images");
                 });
@@ -127,6 +124,9 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
 
@@ -134,6 +134,8 @@ namespace server.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("Posts");
                 });
@@ -151,6 +153,9 @@ namespace server.Migrations
                     b.Property<int>("LangId")
                         .HasColumnType("int");
 
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
@@ -163,6 +168,8 @@ namespace server.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LanguageId");
 
                     b.HasIndex("PostId");
 
@@ -190,6 +197,10 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -203,27 +214,43 @@ namespace server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("server.DataAccess.Entities.Image", b =>
-                {
-                    b.HasOne("server.DataAccess.Entities.Post", "Post")
+                    b.HasOne("server.DataAccess.Entities.Language", "Language")
                         .WithMany()
-                        .HasForeignKey("PostId")
+                        .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Post");
+                    b.Navigation("Category");
+
+                    b.Navigation("Language");
+                });
+
+            modelBuilder.Entity("server.DataAccess.Entities.Post", b =>
+                {
+                    b.HasOne("server.DataAccess.Entities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("server.DataAccess.Entities.PostLang", b =>
                 {
+                    b.HasOne("server.DataAccess.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("server.DataAccess.Entities.Post", "Post")
                         .WithMany()
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Language");
 
                     b.Navigation("Post");
                 });

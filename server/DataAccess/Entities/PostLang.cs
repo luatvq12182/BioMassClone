@@ -9,5 +9,6 @@
         public string Body { get; set; }
         public string ShortDescription { get; set; }
         public Post Post { get; set; }
+        public Language Language { get; set; }
     }
 }
