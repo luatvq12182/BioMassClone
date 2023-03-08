@@ -4,12 +4,12 @@ using Microsoft.Extensions.Options;
 
 namespace server.DataAccess.EF
 {
-    public class BioMassDbContextFactory : IDesignTimeDbContextFactory<BioMassDbContext>
+    public class GreenWayDbContextFactory : IDesignTimeDbContextFactory<GreenWayDbContext>
     {
-        public BioMassDbContext CreateDbContext(string[] args)
+        public GreenWayDbContext CreateDbContext(string[] args)
         {
 
-            var optionBuilder = new DbContextOptionsBuilder<BioMassDbContext>();
+            var optionBuilder = new DbContextOptionsBuilder<GreenWayDbContext>();
 
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -17,7 +17,7 @@ namespace server.DataAccess.EF
 
             optionBuilder.UseMySQL(configuration.GetConnectionString("MySqlConn"));
 
-            return new BioMassDbContext(optionBuilder.Options);
+            return new GreenWayDbContext(optionBuilder.Options);
         }
     }
 }
