@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace server.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("/")]
     public class HomeController : ControllerBase
     {
