@@ -106,29 +106,33 @@ namespace server.Services
         {
             var result = new List<CategoryModel>();
             var standardItem = await _categoryRepository.GetById(id);
-            result.Add(new CategoryModel
+            if(standardItem != null)
             {
-                Id = standardItem.Id,
-                LanguageId = null,
-                Name = standardItem.Name,
-                Slug = standardItem.Slug
-            });
-            var specificItems =  _catLangRepository.FindAll(x=>x.CategoryId == id).ToList();
-
-            if(specificItems!= null && specificItems.Any())
-            {
-                foreach(var item in specificItems)
+                result.Add(new CategoryModel
                 {
-                    result.Add(new CategoryModel
+                    Id = standardItem.Id,
+                    LanguageId = null,
+                    Name = standardItem.Name,
+                    Slug = standardItem.Slug
+                });
+                var specificItems = _catLangRepository.FindAll(x => x.CategoryId == id).ToList();
+
+                if (specificItems != null && specificItems.Any())
+                {
+                    foreach (var item in specificItems)
                     {
-                        Id = item.Id,
-                        LanguageId = item.LanguageId,
-                        Name = item.Name,
-                        Slug = item.Slug
-                    });
+                        result.Add(new CategoryModel
+                        {
+                            Id = item.Id,
+                            LanguageId = item.LanguageId,
+                            Name = item.Name,
+                            Slug = item.Slug
+                        });
+                    }
                 }
+                return result;
             }
-            return result;
+            return null;
         }
 
         public async Task<IReadOnlyList<CategoryModel>> InsertCategoryTransactional(IReadOnlyList<CategoryModel> model)
