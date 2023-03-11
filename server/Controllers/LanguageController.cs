@@ -17,9 +17,9 @@ namespace server.Controllers
             _languageService = languageService;
         }
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            var data = _languageService.GetAll();
+            var data = await _languageService.GetAll();
             return Ok(data);
         }
         [HttpGet("{id}")]
@@ -32,6 +32,10 @@ namespace server.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(LanguageModel model)
         {
+            //if (_languageService.AlreadyExist(model, out string message))
+            //{
+            //    return BadRequest(message);
+            //}
             var data = await _languageService.Insert(new Language 
             {
                 Name = model.Name,
