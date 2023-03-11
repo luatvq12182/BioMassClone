@@ -1,12 +1,14 @@
 ﻿using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Repositories;
+using server.ViewModel.Users;
 
 namespace server.Services
 {
     public interface IUserService : IEntityService<User>
     {
-       Task<User> GetUserByUserName(string userName);
+       Task<User> GetUserByIdentify(string userName);
+        bool AlreadyExist(RegisterModel model , out string message);
     }
     public class UserService : EntityService<User> , IUserService
     {
@@ -16,9 +18,14 @@ namespace server.Services
             _repos = repository;
         }
 
-        public async Task<User> GetUserByUserName(string userName)
+        public bool AlreadyExist(RegisterModel model , out string message)
         {
-            var result =  await _repos.GetUserByUserName(userName);
+            return _repos.AlreadyExist(model, out message);
+        }
+
+        public async Task<User> GetUserByIdentify(string userName)
+        {
+            var result =  await _repos.GetUserByIdentify(userName);
             return result;
 
         }

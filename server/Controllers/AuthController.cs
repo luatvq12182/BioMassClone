@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using server.DataAccess.Entities;
+using server.Options;
 using server.Services;
 using server.ViewModel.Users;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using BC = BCrypt.Net.BCrypt;
 
@@ -47,6 +49,10 @@ namespace server.Controllers
                 {
                     return BadRequest("");
                 }
+                if (_userService.AlreadyExist(model, out string message))
+                {
+                    return BadRequest(message);
+                }
                 else
                 {
                     var user = new User
@@ -65,7 +71,7 @@ namespace server.Controllers
         }
         private async Task<UserModel> AuthenticateUser(LoginModel login)
         {
-            var user = await _userService.GetUserByUserName(login.UserName);
+            var user = await _userService.GetUserByIdentify(login.Identify);
             if (user != null)
             {
                 return new UserModel
@@ -80,17 +86,24 @@ namespace server.Controllers
         }
         private string GenerateJSONWebToken(UserModel userInfo)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var jwtOptions = new JwtOption();
+            _config.GetSection("Jwt").Bind(jwtOptions);
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-              _config["Jwt:Issuer"],
-              null,
-              expires: DateTime.Now.AddMinutes(120),
-              signingCredentials: credentials);
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Name, userInfo.UserName),
+                new Claim(JwtRegisteredClaimNames.Email, userInfo.Email)
+            };
+
+            var token = new JwtSecurityToken(jwtOptions.Issuer,
+                jwtOptions.Audience,
+                claims,
+                expires: DateTime.Now.AddMinutes(1200),
+                signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
     }
 }

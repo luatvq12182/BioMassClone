@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 namespace server.Controllers
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("api/media")]
     public class MediaController :ControllerBase
     {

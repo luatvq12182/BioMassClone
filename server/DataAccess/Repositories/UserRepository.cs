@@ -2,15 +2,17 @@
 using server.DataAccess.Common;
 using server.DataAccess.EF;
 using server.DataAccess.Entities;
+using server.ViewModel.Users;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
 
 namespace server.DataAccess.Repositories
 {
     public interface IUserRepository: IBaseRepository<User>
     {
-        Task<User> GetUserByUserName(string userName);
-        Task<bool> UserNameAlreadyExist(string userName);
+        Task<User> GetUserByIdentify(string identify);
+        bool AlreadyExist(RegisterModel model , out string message);
     }
     public class UserRepository : BaseRepository<User>, IUserRepository
     {
@@ -19,15 +21,29 @@ namespace server.DataAccess.Repositories
 
         }
 
-        public async Task<User> GetUserByUserName(string userName)
+        public async Task<User> GetUserByIdentify(string identify)
         {
-            var result =  await Dbset.FirstOrDefaultAsync(x=>x.UserName== userName);
+            var result =  await Dbset.FirstOrDefaultAsync(x=>x.UserName== identify || x.Email == identify);
             return result;
         }
 
-        public async Task<bool> UserNameAlreadyExist(string userName)
+        public bool AlreadyExist(RegisterModel model, out string message)
         {
-            return await Dbset.AnyAsync(x=>x.UserName== userName);
+            message = string.Empty;
+            var query = Dbset.AsQueryable().ToList();
+            if(query.Any(x=>x.UserName == model.UserName))
+            {
+                message += " User name already exist !";
+            }
+            if (query.Any(x => x.UserName == model.UserName))
+            {
+                message += " Email already exist !";
+            }
+            if (!string.IsNullOrEmpty(message))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

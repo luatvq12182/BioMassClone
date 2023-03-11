@@ -6,7 +6,7 @@ using server.ViewModel.Categories;
 namespace server.Controllers
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("api/categories")]
     public class CategoryControler : ControllerBase
     {
