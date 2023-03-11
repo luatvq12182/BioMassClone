@@ -9,7 +9,7 @@ import { Button, Card, Input } from "@/components/common";
 import { setAuthorizationHeader } from "@/services/httpClient";
 
 type FormProps = {
-    username: string;
+    identify: string;
     password: string;
 };
 
