@@ -76,10 +76,10 @@ const SignIn = () => {
                     onSubmit={handleSubmit(submitHandler)}
                 >
                     <Input
-                        error={!!errors["username"]}
+                        error={!!errors["identify"]}
                         label='Email'
                         sx={{ mb: 2 }}
-                        {...register("username", {
+                        {...register("identify", {
                             required: true,
                         })}
                     />
