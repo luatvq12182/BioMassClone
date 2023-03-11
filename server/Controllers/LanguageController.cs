@@ -16,20 +16,20 @@ namespace server.Controllers
         {
             _languageService = languageService;
         }
-        [HttpGet("languages")]
+        [HttpGet]
         public IActionResult GetAll()
         {
             var data = _languageService.GetAll();
             return Ok(data);
         }
-        [HttpGet("languages/{id}")]
+        [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
             var data = _languageService.GetById(id);
             return Ok(data);
         }
 
-        [HttpPost("languages")]
+        [HttpPost]
         public async Task<IActionResult> Add(LanguageModel model)
         {
             var data = await _languageService.Insert(new Language 
@@ -40,7 +40,7 @@ namespace server.Controllers
             });
             return Ok(data);
         }
-        [HttpPut("languages/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute]int id , LanguageModel model)
         {
             var entity = await _languageService.GetById(id);
@@ -56,7 +56,7 @@ namespace server.Controllers
             return Ok();
         }
 
-        [HttpDelete("languages/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var entity = await _languageService.GetById(id);

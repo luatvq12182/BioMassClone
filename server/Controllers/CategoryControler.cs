@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using server.Services;
 using server.ViewModel.Categories;
-using server.DataAccess.Entities;
 
 namespace server.Controllers
 {
@@ -16,28 +15,28 @@ namespace server.Controllers
         {
             _categoryService = categoryService;
         }
-        [HttpGet("categories")]
+        [HttpGet]
         public async Task< IActionResult> GetAll(int? languageId) 
         {
             var data =  await _categoryService.GetByLanguageId(languageId);
             return Ok(data);
         }
 
-        [HttpGet("categories/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var data = await _categoryService.GetDetails(id);
             return Ok(data);
         }
 
-        [HttpPost("categories")]
+        [HttpPost]
         public async Task<IActionResult> Add(IReadOnlyList<CategoryModel> model)
         {
             var data = await _categoryService.InsertCategoryTransactional(model);
             return Ok(data);
         }
 
-        [HttpDelete("categories{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete( [FromRoute] int id )
         {
             if(await _categoryService.Remove(id))
@@ -46,7 +45,7 @@ namespace server.Controllers
                 return NotFound();
         }
 
-        [HttpPut("categories{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id ,IReadOnlyList<CategoryModel> model)
         {
             var entity = await _categoryService.GetById(id);
@@ -54,8 +53,6 @@ namespace server.Controllers
                 return NotFound();
             else
             {
-
-
                 return Ok();
             }
         }
