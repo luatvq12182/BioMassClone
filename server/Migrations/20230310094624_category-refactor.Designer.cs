@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using server.DataAccess.EF;
 
@@ -10,9 +11,10 @@ using server.DataAccess.EF;
 namespace server.Migrations
 {
     [DbContext(typeof(GreenWayDbContext))]
-    partial class BioMassDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230310094624_category-refactor")]
+    partial class categoryrefactor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,6 +98,10 @@ namespace server.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<bool>("IsDefault")
                         .HasColumnType("tinyint(1)");
 
@@ -115,9 +121,6 @@ namespace server.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Author")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Body")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -126,14 +129,6 @@ namespace server.Migrations
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("ShortDescription")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<int>("Views")
                         .HasColumnType("int");

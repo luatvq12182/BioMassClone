@@ -1,11 +1,10 @@
-﻿namespace server.DataAccess.Entities
+﻿namespace server.ViewModel.Languages
 {
-    public class Language
+    public class LanguageModel
     {
         public int Id { get; set; }
-        public string Code { get; set; }
         public string Name { get; set; }
+        public string Code { get; set; }
         public bool IsDefault { get; set; }
-
     }
 }
