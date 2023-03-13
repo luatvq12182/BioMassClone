@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using server.Services;
 using server.DataAccess.Entities;
 using server.ViewModel.Languages;
+using MySqlConnector;
 
 namespace server.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("api/languages")]
     public class LanguageController : ControllerBase
     {
@@ -26,11 +27,20 @@ namespace server.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var start = DateTime.Now;
-            var data = await _languageService.GetById(id);
+            using var connection = new MySqlConnection("Server=34.87.73.59,3306;User ID=root;Password=root;Database=green-way-db");
+            connection.Open();
+
+            using var command = new MySqlCommand("SELECT * FROM Languages;", connection);
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                Console.WriteLine(reader.GetInt32(0) + ", " + reader.GetString(1) + ", " + reader.GetString(2) +", " +reader.GetBoolean(3));
+            }
+            //var data = await _languageService.GetById(id);
             var end = DateTime.Now;
             var duration = (end- start).TotalSeconds.ToString();
             Console.WriteLine($"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA {duration}");
-            return Ok(data);
+            return Ok();
         }
 
         [HttpPost]
