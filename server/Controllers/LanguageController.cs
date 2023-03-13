@@ -23,9 +23,9 @@ namespace server.Controllers
             return Ok(data);
         }
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var data = _languageService.GetById(id);
+            var data = await _languageService.GetById(id);
             return Ok(data);
         }
 

@@ -4,20 +4,21 @@ namespace server.Helper
 {
     public static class Utilities
     {
-        public static async Task<string> UploadFile(IFormFile file, string path, string fileName = null)
+        public static string STATIC_IMAGE_PATH = @"/Uploads/Images/";
+        public static async Task<bool> UploadFile(IFormFile file, string filePath, string fileName = null)
         {
             try
             {
-                CreateIfMissing(path);
+                CreateIfMissing(filePath);
 
-                string pathFile = Path.Combine(path, fileName);
+                string pathFile = Path.Combine(filePath,fileName);
 
                 var supportedTypes = new[] { "jpg", "jpeg", "png", "gif" };
                 var fileExt = Path.GetExtension(file.FileName).Substring(1);
 
                 if (!supportedTypes.Contains(fileExt.ToLower())) /// Khác các file định nghĩa
                 {
-                    return null;
+                    return false;
                 }
                 else
                 {
@@ -25,12 +26,12 @@ namespace server.Helper
                     {
                         await file.CopyToAsync(stream);
                     }
-                    return pathFile;
+                    return true;
                 }
             }
             catch (Exception ex)
             {
-                return null;
+                return false;
             }
         }
         public static void CreateIfMissing(string path)
@@ -49,6 +50,7 @@ namespace server.Helper
             url = Regex.Replace(url, @"[ýỳỵỉỹ]", "y");
             url = Regex.Replace(url, @"[úùụủũưứừựửữ]", "u");
             url = Regex.Replace(url, @"[đ]", "d");
+            url = Regex.Replace(url, @"_", "-");
 
             //2. Chỉ cho phép nhận:[0-9a-z-\s]
             url = Regex.Replace(url.Trim(), @"[^0-9a-z-\s]", "").Trim();

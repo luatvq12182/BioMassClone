@@ -6,12 +6,12 @@ using server.ViewModel.Users;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
-
+using BC = BCrypt.Net.BCrypt;
 namespace server.DataAccess.Repositories
 {
     public interface IUserRepository: IBaseRepository<User>
     {
-        Task<User> GetUserByIdentify(string identify);
+        Task<User> GetUserByIdentify(LoginModel model );
         bool AlreadyExist(RegisterModel model , out string message);
     }
     public class UserRepository : BaseRepository<User>, IUserRepository
@@ -21,9 +21,12 @@ namespace server.DataAccess.Repositories
 
         }
 
-        public async Task<User> GetUserByIdentify(string identify)
+        public async Task<User> GetUserByIdentify(LoginModel model)
         {
-            var result =  await Dbset.FirstOrDefaultAsync(x=>x.UserName== identify || x.Email == identify);
+            var passWordHash = BC.HashPassword(model.Password);        
+            var isValid = BC.Verify(model.Password, passWordHash);
+
+            var result =  await Dbset.FirstOrDefaultAsync(x=>x.UserName== model.Identify && isValid || x.Email == model.Identify && isValid);
             return result;
         }
 

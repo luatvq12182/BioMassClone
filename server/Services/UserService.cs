@@ -7,7 +7,7 @@ namespace server.Services
 {
     public interface IUserService : IEntityService<User>
     {
-       Task<User> GetUserByIdentify(string userName);
+       Task<User> GetUserByIdentify(LoginModel model);
         bool AlreadyExist(RegisterModel model , out string message);
     }
     public class UserService : EntityService<User> , IUserService
@@ -23,9 +23,9 @@ namespace server.Services
             return _repos.AlreadyExist(model, out message);
         }
 
-        public async Task<User> GetUserByIdentify(string userName)
+        public async Task<User> GetUserByIdentify(LoginModel model)
         {
-            var result =  await _repos.GetUserByIdentify(userName);
+            var result =  await _repos.GetUserByIdentify(model);
             return result;
 
         }

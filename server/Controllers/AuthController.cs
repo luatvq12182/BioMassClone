@@ -41,7 +41,7 @@ namespace server.Controllers
             return response;
         }
         [HttpPost("register")]
-        public IActionResult Register(RegisterModel model)
+        public async Task<IActionResult> Register(RegisterModel model)
         {
             if (ModelState.IsValid)
             {
@@ -62,7 +62,7 @@ namespace server.Controllers
                         UserName = model.UserName,
                         IsAdmin = true
                     };
-                    _userService.Insert(user);
+                    await _userService.Insert(user);
 
                     return Ok();
                 }
@@ -71,7 +71,7 @@ namespace server.Controllers
         }
         private async Task<UserModel> AuthenticateUser(LoginModel login)
         {
-            var user = await _userService.GetUserByIdentify(login.Identify);
+            var user = await _userService.GetUserByIdentify(login);
             if (user != null)
             {
                 return new UserModel

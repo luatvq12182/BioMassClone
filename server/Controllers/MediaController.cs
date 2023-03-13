@@ -1,60 +1,79 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using server.Services;
-using System.Net.Http.Headers;
+using server.Helper;
+using System.IO;
+using server.DataAccess.Entities;
 
 namespace server.Controllers
 {
     [ApiController]
     [Authorize]
     [Route("api/media")]
-    public class MediaController :ControllerBase
+    public class MediaController : ControllerBase
     {
         private readonly IImageService _imageService;
         private readonly IWebHostEnvironment _env;
-        public MediaController(IImageService imageService , IWebHostEnvironment env)
+        public MediaController(IImageService imageService, IWebHostEnvironment env)
         {
-            _imageService= imageService;
+            _imageService = imageService;
             _env = env;
         }
-        [HttpPost]
-        public IActionResult Upload(IFormFile file)
+        [HttpPost("upload")]
+        public async Task<IActionResult> Upload()
         {
-            if(file != null)
+            var filesToUpload = HttpContext.Request.Form.Files;
+            if (filesToUpload != null && filesToUpload.Any())
             {
-
-                string fileExtenstion = Path.GetExtension(file.FileName).Trim();
-
-            }
-            try
-            {
-                var mediaDirectory = Path.Combine("Uploads", "Images");
-                string path = Path.Combine(_env.WebRootPath, mediaDirectory);
-
-                var media = Request.Form.Files[0];
-                if (media.Length > 0)
+                foreach (var file in filesToUpload)
                 {
-                    var fileName = ContentDispositionHeaderValue.Parse(media.ContentDisposition).FileName.Trim('"');
-                    var fullPath = Path.Combine(path, fileName);
-                    var dbPath = Path.Combine(mediaDirectory, fileName);
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    try
                     {
-                        media.CopyTo(stream);
+                        var mediaDirectory = Path.Combine("Uploads", "Images");
+                        string filePath = Path.Combine(_env.WebRootPath, mediaDirectory);
+
+                        string fileExtension = Path.GetExtension(file.FileName).Trim();
+                        var fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var friendlyName = Utilities.SEOUrl(fileName);
+
+                        string saveFileName = friendlyName + fileExtension;
+
+                        var isSuccess = await Utilities.UploadFile(file, filePath, saveFileName);
+                        if (isSuccess)
+                        {
+                            var pathToSave = Utilities.STATIC_IMAGE_PATH + saveFileName;
+                            var image = new Image
+                            {
+                                Name = saveFileName,
+                                Slug = friendlyName,
+                                ImageUrl = pathToSave
+                            };
+                            await _imageService.Insert(image);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest(ex.Message);
                     }
 
-                    return Ok(new { dbPath });
                 }
-                else
-                {
-                    return BadRequest();
-                }
+                return Ok();
             }
-            catch(Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            return BadRequest();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllImage()
+        {
+            var data = await _imageService.GetAll();
+            return Ok(data);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var data = await _imageService.GetById(id);
+            return Ok(data);
+        }
     }
 }
