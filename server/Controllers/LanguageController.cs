@@ -25,7 +25,11 @@ namespace server.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
+            var start = DateTime.Now;
             var data = await _languageService.GetById(id);
+            var end = DateTime.Now;
+            var duration = (end- start).TotalSeconds.ToString();
+            Console.WriteLine($"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA {duration}");
             return Ok(data);
         }
 
