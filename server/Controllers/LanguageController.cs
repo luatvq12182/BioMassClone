@@ -26,7 +26,7 @@ namespace server.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var data = _languageService.GetByIdAsync(id);
+            var data = await _languageService.GetByIdAsync(id);
             return Ok(data);
         }
 
