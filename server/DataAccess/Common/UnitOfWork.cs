@@ -1,89 +1,57 @@
-﻿using server.DataAccess.EF;
-using System.ComponentModel.DataAnnotations;
-using System.Transactions;
+﻿using server.DataAccess.Persistence;
+using server.DataAccess.Repositories;
 
 namespace server.DataAccess.Common
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly GreenWayDbContext _context;
-        private readonly Dictionary<Type, object> _repository;
-        private bool _disposed;
+        private readonly DbSession _session;
+        public ICategoryRepository Category {get;}
 
-        public UnitOfWork(GreenWayDbContext context)
+        public ICatLangsRepository CatLang {get;}
+
+        public IPostRepository Post {get;}
+
+        public IPostLangRepository PostLang {get;}
+
+        public IImageRepository Image {get;}
+
+        public IUserRepository User {get;}
+
+        public ILanguageRepository Language {get;}
+
+        public UnitOfWork(DbSession session, ICategoryRepository category, ICatLangsRepository catLang, IPostRepository post, IPostLangRepository postLang, IImageRepository image, IUserRepository user, ILanguageRepository language)
         {
-            _context = context;
-            _repository = new Dictionary<Type, object>();
-            _disposed = false;
+            _session = session;
+            Category = category;
+            CatLang = catLang;
+            Post = post;
+            PostLang = postLang;
+            Image = image;
+            User = user;
+            Language = language;
         }
 
-        /// <summary>
-        /// Function us to Get instance of a Object on Database
-        /// </summary>
-        /// <typeparam name="TEntity">Object is target</typeparam>
-        /// <returns></returns>
-        public IBaseRepository<TEntity> GetRepository<TEntity>() where TEntity : class
-        {
-            //Check if the Dictionary key contains the Model class
-            if (_repository.Keys.Contains(typeof(TEntity)))
-            {
-                return _repository[typeof(TEntity)] as IBaseRepository<TEntity>;
-            }
-            // If the repository for that Model class doesn't exist, create it
-            var repository = new BaseRepository<TEntity>(_context);
-
-            _repository.Add(typeof(TEntity), repository);
-            return repository;
-        }
-
-        public void TransactionSaveChanges()
-        {
-            using (var scope = new TransactionScope(TransactionScopeOption.Required,
-                               new TransactionOptions { IsolationLevel = IsolationLevel.ReadCommitted }))
-            {
-                try
-                {
-                    _context.SaveChanges();
-                    scope.Complete();
-                }
-                catch (Exception ex)
-                {
-                    scope.Dispose();
-                    throw ex;
-                }
-            }
-        }
-
-        public void SaveChanges()
+        public async Task<bool> CommitThings()
         {
             try
             {
-                _context.SaveChanges();
-            }
-            catch (ValidationException e)
-            {
-                throw e;
-            }
-        }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+                //await _mediator.DispatchDomainEvents(this);
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
+                _session.Transaction.Commit();
+                return true;
+
+            }
+            catch (Exception e)
             {
-                if (disposing)
-                {
-                    _context.Dispose();
-                }
-                _disposed = true;
+                Console.WriteLine($"Could not commit the transaction, reason: {e.Message}");
+                _session.Transaction.Rollback();
+                return false;
+            }
+            finally
+            {
+                _session.Transaction.Dispose();
             }
         }
     }

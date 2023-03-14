@@ -1,7 +1,6 @@
 using Autofac.Extensions.DependencyInjection;
 using Autofac;
 using server.DI;
-using server.DataAccess.EF;
 using Microsoft.EntityFrameworkCore;
 using Autofac.Core;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +8,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using server.Options;
 using Microsoft.OpenApi.Models;
+using server.Services;
+using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ builder.Services.AddCors(option =>
         .AllowCredentials()
     );
 });
+builder.Services.AddInfrastructure();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -72,26 +74,10 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-
-builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new EFModule()));
-builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new RepositoryModule()));
 builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new ServicesModule()));
-
-builder.Services.AddDbContext<GreenWayDbContext>(options =>
-{
-    options.UseMySQL(builder.Configuration.GetConnectionString("MySqlConn"));
-
-});
-
-
+builder.Services.AddTransient(x =>new MySqlConnection(builder.Configuration.GetConnectionString("MySqlConn")));
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var dataContext = scope.ServiceProvider.GetRequiredService<GreenWayDbContext>();
-    dataContext.Database.Migrate();
-}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

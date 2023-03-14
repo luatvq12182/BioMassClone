@@ -6,7 +6,7 @@ using server.ViewModel.Categories;
 namespace server.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("api/categories")]
     public class CategoryControler : ControllerBase
     {
@@ -48,7 +48,7 @@ namespace server.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id ,IReadOnlyList<CategoryModel> model)
         {
-            var entity = await _categoryService.GetById(id);
+            var entity = await _categoryService.GetByIdAsync(id);
             if(entity == null)
                 return NotFound();
             else

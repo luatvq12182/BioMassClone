@@ -1,19 +1,16 @@
-﻿namespace server.DataAccess.Common
+﻿using server.DataAccess.Repositories;
+
+namespace server.DataAccess.Common
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork
     {
-        /// <summary>
-        /// Function us to Get instance of a Object on Database
-        /// </summary>
-        /// <typeparam name="TEntity">Object is target</typeparam>
-        /// <returns></returns>
-        IBaseRepository<TEntity> GetRepository<TEntity>() where TEntity : class;
-
-        /// <summary>
-        /// Function use to Save all Object is changed into Database
-        /// </summary>
-        void SaveChanges();
-
-        void TransactionSaveChanges();
+        ICategoryRepository Category { get; } 
+        ICatLangsRepository CatLang { get; }
+        IPostRepository Post { get; }
+        IPostLangRepository PostLang { get; }
+        IImageRepository Image { get; }
+        IUserRepository User { get; }
+        ILanguageRepository Language { get; }
+        Task<bool> CommitThings();
     }
 }

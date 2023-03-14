@@ -1,33 +1,61 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using server.DataAccess.Common;
+﻿using server.DataAccess.Common;
 using server.DataAccess.Entities;
-using server.DataAccess.Repositories;
 using server.ViewModel.Languages;
+
 
 namespace server.Services
 {
-    public interface ILanguageService : IEntityService<Language>
+    public interface ILanguageService : IGenericService<Language>
     {
         public Language GetByCode(string code);
-        public bool AlreadyExist (LanguageModel language , out string message);
+        public bool AlreadyExist(LanguageModel language, out string message);
     }
-    public class LanguageService : EntityService<Language>, ILanguageService
+    public class LanguageService : ILanguageService
     {
-        private readonly ILanguageRepository _repos;
-        public LanguageService(IUnitOfWork unitOfWork , ILanguageRepository repository) : base(unitOfWork,repository)
+
+        private readonly IUnitOfWork _unit;
+        public LanguageService(IUnitOfWork unitOfWork)
         {
-            _repos= repository;
+            _unit = unitOfWork;
         }
 
+        public async Task<Language> AddAsync(Language entity)
+        {
+            return await _unit.Language.AddAsync(entity);
+        }
+
+        public async Task<int> DeleteAsync(int id)
+        {
+            return await _unit.Language.DeleteAsync(id);
+        }
+
+        public async Task<IReadOnlyList<Language>> GetAllAsync()
+        {
+            return await _unit.Language.GetAllAsync(); 
+        }
+
+        public async Task<Language> GetByIdAsync(int id)
+        {
+            return await _unit.Language.GetByIdAsync(id);
+        }
+
+        public async Task<Language> UpdateAsync(Language entity)
+        {
+            return await _unit.Language.UpdateAsync(entity);
+        }
         public bool AlreadyExist(LanguageModel language, out string message)
         {
-            return _repos.AlreadyExist(language, out message);
+            return _unit.Language.AlreadyExist(language, out message);
         }
 
-        public  Language GetByCode(string code)
+        public async Task<Language> GetByCode(string code)
         {
-            var result =  _repos.Find(x=>x.Code == code);
-            return result;
+            return await _unit.Language.GetByCode(code);
+        }
+
+        Language ILanguageService.GetByCode(string code)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -20,27 +20,14 @@ namespace server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var data = await _languageService.GetAll();
+            var data = await _languageService.GetAllAsync();
             return Ok(data);
         }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var start = DateTime.Now;
-            using var connection = new MySqlConnection("Server=34.87.73.59,3306;User ID=root;Password=root;Database=green-way-db");
-            connection.Open();
-
-            using var command = new MySqlCommand("SELECT * FROM Languages;", connection);
-            using var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                Console.WriteLine(reader.GetInt32(0) + ", " + reader.GetString(1) + ", " + reader.GetString(2) +", " +reader.GetBoolean(3));
-            }
-            //var data = await _languageService.GetById(id);
-            var end = DateTime.Now;
-            var duration = (end- start).TotalSeconds.ToString();
-            Console.WriteLine($"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA {duration}");
-            return Ok();
+            var data = _languageService.GetByIdAsync(id);
+            return Ok(data);
         }
 
         [HttpPost]
@@ -50,7 +37,7 @@ namespace server.Controllers
             //{
             //    return BadRequest(message);
             //}
-            var data = await _languageService.Insert(new Language 
+            var data = await _languageService.AddAsync(new Language 
             {
                 Name = model.Name,
                 Code= model.Code,
@@ -61,31 +48,29 @@ namespace server.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute]int id , LanguageModel model)
         {
-            var entity = await _languageService.GetById(id);
+            var entity = await _languageService.GetByIdAsync(id);
             if(entity == null)
             {
                 return BadRequest("Not found !");
             }
-
             entity.Name = model.Name;
             entity.Code = model.Code;
             entity.IsDefault = model.IsDefault;
-            await _languageService.Update(entity);            
-            return Ok();
+            await _languageService.UpdateAsync(entity);            
+            return Ok(entity);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var entity = await _languageService.GetById(id);
+            var entity = await _languageService.GetByIdAsync(id);
             if (entity == null)
             {
                 return BadRequest("Not found !");
             }
-            if (_languageService.Delete(id))
-                return Ok();
-            else 
-                return BadRequest();
+            await _languageService.DeleteAsync(id);
+            return Ok();
+
         }
     }
 }

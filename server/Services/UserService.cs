@@ -5,29 +5,52 @@ using server.ViewModel.Users;
 
 namespace server.Services
 {
-    public interface IUserService : IEntityService<User>
+    public interface IUserService : IGenericService<User>
     {
-       Task<User> GetUserByIdentify(LoginModel model);
-        bool AlreadyExist(RegisterModel model , out string message);
+        Task<User> GetUserByIdentify(LoginModel model);
+        Task<bool> AlreadyExist(RegisterModel model);
     }
-    public class UserService : EntityService<User> , IUserService
+    public class UserService : IUserService
     {
-        private readonly IUserRepository _repos;
-        public UserService(IUnitOfWork unitOfWork, IUserRepository repository) : base(unitOfWork, repository)
+        private readonly IUnitOfWork _unit;
+        public UserService(IUnitOfWork unitOfWork)
         {
-            _repos = repository;
+            _unit = unitOfWork;
         }
 
-        public bool AlreadyExist(RegisterModel model , out string message)
+        public Task<User> AddAsync(User entity)
         {
-            return _repos.AlreadyExist(model, out message);
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> AlreadyExist(RegisterModel model)
+        {
+            return await _unit.User.AlreadyExist(model);
+        }
+
+        public Task<int> DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<User>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<User> GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<User> GetUserByIdentify(LoginModel model)
         {
-            var result =  await _repos.GetUserByIdentify(model);
-            return result;
+            return await _unit.User.GetUserByIdentify(model);
+        }
 
+        public Task<User> UpdateAsync(User entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

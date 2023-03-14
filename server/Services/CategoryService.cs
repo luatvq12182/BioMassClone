@@ -1,12 +1,12 @@
 ﻿using server.DataAccess.Common;
 using server.DataAccess.Entities;
-using server.DataAccess.Repositories;
+using server.Helper.Mapper;
 using server.ViewModel.Categories;
-using System.Collections.Generic;
+
 
 namespace server.Services
 {
-    public interface ICategoryService : IEntityService<Category>
+    public interface ICategoryService : IGenericService<Category>
     {
         Task<IReadOnlyList<CategoryModel>> InsertCategoryTransactional(IReadOnlyList<CategoryModel> model);
         Task<IReadOnlyList<CategoryModel>> GetDetails(int id);
@@ -14,122 +14,68 @@ namespace server.Services
         Task<bool> Edit(int id, IReadOnlyList<CategoryModel> model);
         Task<IReadOnlyList<CategoryModel>> GetByLanguageId(int? languageId);
     }
-    public class CategoryService : EntityService<Category>, ICategoryService
+    public class CategoryService : ICategoryService
     {
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly ICatLangsRepository _catLangRepository;
-        public CategoryService(IUnitOfWork unitOfWork, ICategoryRepository categoryRepository , ICatLangsRepository catLangsRepository) : base(unitOfWork, categoryRepository)
+        private readonly IUnitOfWork _unit;
+        public CategoryService(IUnitOfWork unitOfWork)
         {
-            _categoryRepository = categoryRepository;
-            _catLangRepository = catLangsRepository;
+            _unit= unitOfWork;
            
         }
 
-        public async Task<bool> Edit(int id, IReadOnlyList<CategoryModel> model)
+        public Task<Category> AddAsync(Category entity)
         {
-            var standardItem = _categoryRepository.Find(x => x.Id == id);
-            if (standardItem != null)
-            {
-                if(model != null && model.Any())
-                {
-                    foreach (var item in model)
-                    {
-                        if(item.LanguageId is null)
-                        {
-                            standardItem.Name = item.Name;
-                            standardItem.Slug= item.Slug;
-                            await _categoryRepository.Update(standardItem);
-                            UnitOfWork.SaveChanges();
-                        }
-                        else
-                        {
-                            var entity = await _catLangRepository.GetById(item.Id);
-                            if(entity != null)
-                            {
-                                entity.Name = item.Name;
-                                entity.Slug = item.Slug;
-                                await _catLangRepository.Update(entity);
-                                UnitOfWork.SaveChanges();
-                            }
-                            else 
-                                return false;
-                        }
-                    }
-                    return true;
-                }
+            return _unit.Category.AddAsync  (entity);
+        }
 
-            }
-            return false;
+        public Task<int> DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Edit(int id, IReadOnlyList<CategoryModel> model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IReadOnlyList<Category>> GetAllAsync()
+        {
+            return await _unit.Category.GetAllAsync();
+        }
+
+        public async Task<Category> GetByIdAsync(int id)
+        {
+            return await _unit.Category.GetByIdAsync(id);
         }
 
         public async Task<IReadOnlyList<CategoryModel>> GetByLanguageId(int? languageId)
         {
-            var result = new List<CategoryModel>();
-            if (languageId.HasValue)
+            if (!languageId.HasValue)
             {
-                var data =  _catLangRepository.FindAll(x=>x.LanguageId == languageId.Value).ToList();
-                if(data != null && data.Any())
+                var categories =  await _unit.Category.GetAll();
+                if(categories != null && categories.Any())
                 {
-                    foreach (var item in data)
-                    {
-                        result.Add(new CategoryModel
-                        {
-                            Id = item.Id,
-                            LanguageId = item.LanguageId,
-                            Name = item.Name,
-                            Slug = item.Slug
-                        });
-                    }
+                    return categories;
                 }
+                return null;
             }
             else
             {
-                var data = await _categoryRepository.GetAll();
-                if(data != null && data.Any())
-                {
-                    foreach (var item in data)
-                    {
-                        result.Add(new CategoryModel
-                        {
-                            Id = item.Id,
-                            LanguageId = null,
-                            Name = item.Name,
-                            Slug = item.Slug
-                        });
-                    }
-                }
+                return await _unit.CatLang.GetByLanguageId(languageId.Value);
             }
-            return result;
+
         }
 
         public async Task<IReadOnlyList<CategoryModel>> GetDetails(int id)
         {
-            var result = new List<CategoryModel>();
-            var standardItem = await _categoryRepository.GetById(id);
-            if(standardItem != null)
+            var result = new List<CategoryModel>(); 
+            var standardItem = await _unit.Category.GetByIdAsync(id);
+            if (standardItem != null)
             {
-                result.Add(new CategoryModel
-                {
-                    Id = standardItem.Id,
-                    LanguageId = null,
-                    Name = standardItem.Name,
-                    Slug = standardItem.Slug
-                });
-                var specificItems = _catLangRepository.FindAll(x => x.CategoryId == id).ToList();
+                result.Add(standardItem.MapToModel());
 
-                if (specificItems != null && specificItems.Any())
-                {
-                    foreach (var item in specificItems)
-                    {
-                        result.Add(new CategoryModel
-                        {
-                            Id = item.Id,
-                            LanguageId = item.LanguageId,
-                            Name = item.Name,
-                            Slug = item.Slug
-                        });
-                    }
-                }
+                var specificItems = await _unit.CatLang.GetByCategoryId(id);
+                result.AddRange(specificItems);
                 return result;
             }
             return null;
@@ -137,58 +83,50 @@ namespace server.Services
 
         public async Task<IReadOnlyList<CategoryModel>> InsertCategoryTransactional(IReadOnlyList<CategoryModel> model)
         {
-            if (model != null && model.Any()) 
+            var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
+            if(standardItem != null)
             {
-                var standardId = 0;
-                foreach (var item in model)
+                var insertedCategory =   await _unit.Category.AddTransactionalAsync(new Category {Name = standardItem.Name, Slug = standardItem.Slug });
+                var spescificItems = model.Where(x => x.LanguageId > 0).ToList();
+                if(spescificItems != null && spescificItems.Any())
                 {
-                    if(item.LanguageId is null)
+                    foreach (var item in spescificItems)
                     {
-                        var  insertedItem = await _categoryRepository.Insert(new Category
-                        {
-                            Slug= item.Slug,
-                            Name = item.Name
-
-                        });
-
-                        UnitOfWork.SaveChanges();
-                        standardId = insertedItem.Id;
-                    }
-                    else
-                    {
-                        await _catLangRepository.Insert(new CatLang
-                        {
-                            CategoryId = standardId,
-                            LanguageId = item.LanguageId.Value,
-                            Name = item.Name,
-                            Slug = item.Slug,
-                        });
-                    }
+                        await _unit.CatLang.AddTransactionalAsync(new CatLang {CategoryId = insertedCategory.Id,  LanguageId = item.LanguageId.Value, Name = item.Name, Slug = item.Slug });
+                    }                  
+                }
+                if( await _unit.CommitThings())
+                {
+                    return model;
                 }
             }
-            UnitOfWork.SaveChanges();
-            return model;
+            return null;
+
         }
 
         public async Task<bool> Remove(int id)
         {
-            var standardItem = _categoryRepository.Find(x => x.Id == id);
-            if (standardItem != null)
+            var entity = await _unit.Category.GetByIdAsync(id);
+            if(entity!= null)
             {
-                var specificItems = _catLangRepository.FindAll(x=>x.CategoryId == id);
-                if (specificItems != null && specificItems.Any()) 
+                var specificItems = await _unit.CatLang.GetByCategoryId(id);
+                if (specificItems != null && specificItems.Any())
                 {
-                    foreach (var item in specificItems) 
+                    foreach (var item in specificItems)
                     {
-                        _catLangRepository.Delete(item);
-                        UnitOfWork.SaveChanges();
+                        await _unit.CatLang.DeleteAsync(item.Id);
                     }
                 }
-                _categoryRepository.Delete(standardItem);
-                UnitOfWork.SaveChanges(); 
+                await _unit.Category.DeleteAsync(entity.Id);
                 return true;
             }
             return false;
+
+        }
+
+        public Task<Category> UpdateAsync(Category entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

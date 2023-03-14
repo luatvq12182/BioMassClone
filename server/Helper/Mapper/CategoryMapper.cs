@@ -1,0 +1,33 @@
+﻿using server.DataAccess.Entities;
+using server.ViewModel.Categories;
+
+namespace server.Helper.Mapper
+{
+    public static class CategoryMapper 
+    {
+        public static Category MapToCategoryEntity(this CategoryModel model)
+        {
+            return new Category
+            {
+                Name = model.Name,
+                Slug = model.Slug
+            };
+        }
+        public static CategoryModel MapToModel(this Category entity)
+        {
+            return new CategoryModel
+            {
+                Name = entity.Name,
+                Slug = entity.Slug
+            };
+        }
+        public static List<Category> MapToCatLangEntities(this List<CategoryModel> models)
+        {
+            return models.Select(x => x.MapToCategoryEntity()).ToList();
+        }
+        public static List<CategoryModel> MapToModels(this List<Category> entities)
+        {
+            return entities.Select(x => x.MapToModel()).ToList();
+        }
+    }
+}

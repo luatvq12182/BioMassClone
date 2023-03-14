@@ -49,9 +49,9 @@ namespace server.Controllers
                 {
                     return BadRequest("");
                 }
-                if (_userService.AlreadyExist(model, out string message))
+                if ( await _userService.AlreadyExist(model))
                 {
-                    return BadRequest(message);
+                    return BadRequest();
                 }
                 else
                 {
@@ -62,7 +62,7 @@ namespace server.Controllers
                         UserName = model.UserName,
                         IsAdmin = true
                     };
-                    await _userService.Insert(user);
+                    await _userService.AddAsync(user);
 
                     return Ok();
                 }

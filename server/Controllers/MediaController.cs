@@ -48,7 +48,7 @@ namespace server.Controllers
                                 Slug = friendlyName,
                                 ImageUrl = pathToSave
                             };
-                            await _imageService.Insert(image);
+                            await _imageService.AddAsync(image);
                         }
                     }
                     catch (Exception ex)
@@ -65,14 +65,14 @@ namespace server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllImage()
         {
-            var data = await _imageService.GetAll();
+            var data = await _imageService.GetAllAsync();
             return Ok(data);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var data = await _imageService.GetById(id);
+            var data = await _imageService.GetByIdAsync(id);
             return Ok(data);
         }
     }

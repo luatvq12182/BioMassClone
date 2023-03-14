@@ -4,16 +4,42 @@ using server.DataAccess.Repositories;
 
 namespace server.Services
 {
-    public interface IImageService : IEntityService<Image>
+    public interface IImageService : IGenericService<Image>
     {
 
     }
-    public class ImageService : EntityService<Image>, IImageService
+    public class ImageService : IImageService
     {
-        private readonly IImageRepository _repos;
-        public ImageService(IUnitOfWork unitOfWork , IImageRepository repository) : base (unitOfWork,repository)
+
+        private readonly IUnitOfWork _unit;
+        public ImageService(IUnitOfWork unitOfWork)
         {
-            _repos = repository;
+            _unit = unitOfWork;
+        }
+
+        public Task<Image> AddAsync(Image entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<Image>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Image> GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Image> UpdateAsync(Image entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

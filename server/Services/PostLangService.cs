@@ -4,16 +4,41 @@ using server.DataAccess.Repositories;
 
 namespace server.Services
 {
-    public interface IPostLangService : IEntityService<PostLang>
+    public interface IPostLangService : IGenericService<PostLang>
     {
 
     }
-    public class PostLangService : EntityService<PostLang>, IPostLangService
+    public class PostLangService :  IPostLangService
     {
-        private readonly IPostLangRepository _repos;
-        public PostLangService(IUnitOfWork unitOfWork , IPostLangRepository repository) : base(unitOfWork,repository)
+        private readonly IUnitOfWork _unit;
+        public PostLangService(IUnitOfWork unitOfWork)
         {
-            _repos= repository;
+            _unit = unitOfWork;
+        }
+
+        public Task<PostLang> AddAsync(PostLang entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IReadOnlyList<PostLang>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PostLang> GetByIdAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PostLang> UpdateAsync(PostLang entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

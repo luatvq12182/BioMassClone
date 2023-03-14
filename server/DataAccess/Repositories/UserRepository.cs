@@ -1,52 +1,94 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dapper;
+using MySqlConnector;
 using server.DataAccess.Common;
-using server.DataAccess.EF;
 using server.DataAccess.Entities;
+using server.DataAccess.Persistence;
 using server.ViewModel.Users;
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-using System.Security.Principal;
 using BC = BCrypt.Net.BCrypt;
 namespace server.DataAccess.Repositories
 {
-    public interface IUserRepository: IBaseRepository<User>
+    public interface IUserRepository: IGenericRepository<User>
     {
         Task<User> GetUserByIdentify(LoginModel model );
-        bool AlreadyExist(RegisterModel model , out string message);
+        Task<bool> AlreadyExist(RegisterModel model);
     }
-    public class UserRepository : BaseRepository<User>, IUserRepository
+    public class UserRepository : IUserRepository
     {
-        public UserRepository(GreenWayDbContext context) : base(context) 
+        private readonly IConfiguration _configuration;
+        private readonly DbSession _session;
+        public UserRepository(IConfiguration configuration, DbSession dbSession)
         {
-
+            _configuration = configuration;
+            _session = dbSession;
         }
 
         public async Task<User> GetUserByIdentify(LoginModel model)
         {
-            var passWordHash = BC.HashPassword(model.Password);        
-            var isValid = BC.Verify(model.Password, passWordHash);
 
-            var result =  await Dbset.FirstOrDefaultAsync(x=>x.UserName== model.Identify && isValid || x.Email == model.Identify && isValid);
-            return result;
+            var query = "SELECT * FROM Users WHERE UserName = @Identify OR Email =@Identify ";
+
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                var result = await connection.QueryFirstOrDefaultAsync<User>(query, new { Identify = model.Identify });
+                var isValid = BC.Verify(model.Password, result.Password);
+                if (!isValid)
+                {
+                    return null;
+                }               
+                return result;
+            }
+
+
+        }
+        public async Task<User> GetByIdAsync(int id)
+        {
+            var query = "SELECT * FROM Users WHERE Id = @Id";
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                var result = await connection.QueryFirstOrDefaultAsync<User>(query, new {Id = id});
+                return result;
+            }
         }
 
-        public bool AlreadyExist(RegisterModel model, out string message)
+        public  async Task<IReadOnlyList<User>> GetAllAsync()
         {
-            message = string.Empty;
-            var query = Dbset.AsQueryable().ToList();
-            if(query.Any(x=>x.UserName == model.UserName))
+            var query = "SELECT * FROM Users ";
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
-                message += " User name already exist !";
+                connection.Open();
+                var result = await connection.QueryAsync<User>(query);
+                return result.ToList();
             }
-            if (query.Any(x => x.UserName == model.UserName))
+        }
+
+        public async Task<User> AddAsync(User entity)
+        {
+            var sql = "INSERT INTO Users (UserName , Password , Email , IsAdmin ) VALUES (@UserName, @Password, @Email, @IsAdmin) ; SELECT LAST_INSERT_ID() ";
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
-                message += " Email already exist !";
+                connection.Open();
+                var result = await connection.QuerySingleAsync<int>(sql);
+                entity.Id = result;
+                return entity;
             }
-            if (!string.IsNullOrEmpty(message))
-            {
-                return true;
-            }
-            return false;
+        }
+
+        public Task<User> UpdateAsync(User entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<int> DeleteAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public  async Task<bool> AlreadyExist(RegisterModel model)
+        {
+            var users =  await GetAllAsync();
+            return users.Any(x => x.UserName == model.UserName || x.Email == model.Email);
         }
     }
 }
