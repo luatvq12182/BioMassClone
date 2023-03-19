@@ -75,7 +75,6 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new ServicesModule()));
-builder.Services.AddTransient(x =>new MySqlConnection(builder.Configuration.GetConnectionString("MySqlConn")));
 
 var app = builder.Build();
 

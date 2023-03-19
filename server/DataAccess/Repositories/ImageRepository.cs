@@ -2,7 +2,7 @@
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
 using Dapper;
-using MySqlConnector;
+using Microsoft.Data.SqlClient;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace server.DataAccess.Repositories
@@ -23,8 +23,8 @@ namespace server.DataAccess.Repositories
 
         public async Task<Image> AddAsync(Image entity)
         {
-            var sql = " INSERT INTO Images (Name , SLug , ImageUrl , ShowOnSlider) VALUES (@Name, @Slug,@ImageUrl,@ShowOnSlider) ; SELECT LAST_INSERT_ID() ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            var sql = " INSERT INTO Images (Name , SLug , ImageUrl , ShowOnSlider) VALUES (@Name, @Slug,@ImageUrl,@ShowOnSlider) ; SELECT CAST(SCOPE_IDENTITY() as int) ";
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QuerySingleAsync<int>(sql, entity);
@@ -36,7 +36,7 @@ namespace server.DataAccess.Repositories
         public async Task<int> DeleteAsync(int id)
         {
             var sql = " DELETE FROM Images WHERE Id = @Id ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(sql, new {Id = id});
@@ -47,7 +47,7 @@ namespace server.DataAccess.Repositories
         public async Task<IReadOnlyList<Image>> GetAllAsync()
         {
             var query = "SELECT * FROM Images ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryAsync<Image>(query);
@@ -58,7 +58,7 @@ namespace server.DataAccess.Repositories
         public async Task<Image> GetByIdAsync(int id)
         {
             var query = "SELECT * FROM Images WHERE Id = @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryFirstOrDefaultAsync<Image>(query, new { Id = id });
@@ -69,7 +69,7 @@ namespace server.DataAccess.Repositories
         public async Task<Image> UpdateAsync(Image entity)
         {
             var sql = "UPDATE Images SET  Name = @Name , SLug = @Slug , ImageUrl = @ImageUrl , ShowOnSlider = @ShowOnSlider ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(sql,entity);

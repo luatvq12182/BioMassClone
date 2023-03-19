@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using MySqlConnector;
+using Microsoft.Data.SqlClient;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
@@ -23,8 +23,8 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Post> AddAsync(Post entity)
         {
-            var sql = "INSERT INTO Posts (CategoryId,Title, Thumbnail, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title,@Thumbnail, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            var sql = "INSERT INTO Posts (CategoryId,Title, Thumbnail, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title,@Thumbnail, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT CAST(SCOPE_IDENTITY() as int) ";
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QuerySingleAsync<int>(sql, entity);
@@ -36,7 +36,7 @@ namespace server.DataAccess.Repositories
         public async Task<int> DeleteAsync(int id)
         {
             var sql = "DELETE FROM Posts WHERE Id = @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(sql);
@@ -47,7 +47,7 @@ namespace server.DataAccess.Repositories
         public async Task<IReadOnlyList<Post>> GetAllAsync()
         {
             var query = "SELECT * FROM Posts ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryAsync<Post>(query);
@@ -58,7 +58,7 @@ namespace server.DataAccess.Repositories
         public async Task<Post> GetByIdAsync(int id)
         {
             var query = "SELECT * FROM Posts WHERE Id = @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QuerySingleOrDefaultAsync<Post>(query, new { Id = id });
@@ -73,7 +73,7 @@ namespace server.DataAccess.Repositories
             int totalCount;
             var query = "Select * From Posts LIMIT @PageSize  OFFSET @OFFSET ; SELECT COUNT(*) FROM Posts ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
                 connection.Open();
                 using (var multi = await connection.QueryMultipleAsync(query, new { @PageSize = model.Pagesize, @OFFSET = offSet}))
@@ -88,7 +88,7 @@ namespace server.DataAccess.Repositories
         public async Task<Post> UpdateAsync(Post entity)
         {
             var sql = "UPDATE Posts SET CategoryId = @CategoryId , Title = @Title, Thumbnail = @Thumbnail, Body=@Body ,ShortDescription=@ShortDescription ,Views = @Views , Author=@Author WHERE Id=@Id ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(sql, entity);

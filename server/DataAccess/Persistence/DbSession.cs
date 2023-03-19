@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using MySqlConnector;
+using Microsoft.Data.SqlClient;
 
 namespace server.DataAccess.Persistence;
 /// <summary>
@@ -20,7 +20,7 @@ public sealed class DbSession : IDisposable
         {
             if (_Connection == null)
             {
-                _Connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                _Connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
                 _Connection.Open();
                 Transaction = _Connection.BeginTransaction(IsolationLevel.ReadCommitted);
             }

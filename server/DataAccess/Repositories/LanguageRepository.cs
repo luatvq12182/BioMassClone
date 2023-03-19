@@ -1,10 +1,9 @@
 ﻿using Dapper;
-using MySql.Data.MySqlClient;
+using Microsoft.Data.SqlClient;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
 using server.ViewModel.Languages;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace server.DataAccess.Repositories
 {
@@ -25,9 +24,9 @@ namespace server.DataAccess.Repositories
 
         public async Task<Language> AddAsync(Language entity)
         {
-            var sql = "INSERT INTO Languages (Code, Name, IsDefault) VALUES (@Code,@Name,@IsDefault); SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Languages (Code, Name, IsDefault) VALUES (@Code,@Name,@IsDefault); SELECT CAST(SCOPE_IDENTITY() as int) ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QuerySingleAsync<int>(sql, entity);
@@ -46,7 +45,7 @@ namespace server.DataAccess.Repositories
             var sql = " DELETE  FROM Languages WHERE Id = @Id ";
 
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(sql, new { Id = id });
@@ -59,7 +58,7 @@ namespace server.DataAccess.Repositories
             var query = " SELECT * FROM Languages ";
 
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryAsync<Language>(query);
@@ -75,7 +74,7 @@ namespace server.DataAccess.Repositories
         public async Task<Language> GetByIdAsync(int id)
         {
             var query = "Select * FROM Languages WHERE Id = @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryFirstOrDefaultAsync<Language>(query, new { Id = id });
@@ -86,7 +85,7 @@ namespace server.DataAccess.Repositories
         public async Task<Language> UpdateAsync(Language entity)
         {
             var sql = "UPDATE Languages SET Code = @Code, Name = @Name, IsDefault=@Isdefault WHERE Id= @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(sql, entity);

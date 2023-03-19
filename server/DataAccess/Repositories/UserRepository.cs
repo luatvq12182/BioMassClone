@@ -1,10 +1,11 @@
 ﻿using Dapper;
-using MySqlConnector;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
 using server.ViewModel.Users;
 using BC = BCrypt.Net.BCrypt;
+using Microsoft.Data.SqlClient;
+
 namespace server.DataAccess.Repositories
 {
     public interface IUserRepository: IGenericRepository<User>
@@ -27,7 +28,7 @@ namespace server.DataAccess.Repositories
 
             var query = "SELECT * FROM Users WHERE UserName = @Identify OR Email =@Identify ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryFirstOrDefaultAsync<User>(query, new { Identify = model.Identify });
@@ -44,7 +45,7 @@ namespace server.DataAccess.Repositories
         public async Task<User> GetByIdAsync(int id)
         {
             var query = "SELECT * FROM Users WHERE Id = @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryFirstOrDefaultAsync<User>(query, new {Id = id});
@@ -55,7 +56,7 @@ namespace server.DataAccess.Repositories
         public  async Task<IReadOnlyList<User>> GetAllAsync()
         {
             var query = "SELECT * FROM Users ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryAsync<User>(query);
@@ -65,8 +66,8 @@ namespace server.DataAccess.Repositories
 
         public async Task<User> AddAsync(User entity)
         {
-            var sql = "INSERT INTO Users (UserName , Password , Email , IsAdmin ) VALUES (@UserName, @Password, @Email, @IsAdmin) ; SELECT LAST_INSERT_ID() ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            var sql = "INSERT INTO Users (UserName , Password , Email , IsAdmin ) VALUES (@UserName, @Password, @Email, @IsAdmin) ; SELECT CAST(SCOPE_IDENTITY() as int)";
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QuerySingleAsync<int>(sql,entity);

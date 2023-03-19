@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using MySqlConnector;
+using Microsoft.Data.SqlClient;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
@@ -20,8 +20,8 @@ namespace server.DataAccess.Repositories
         }
         public async Task<PostLang> AddAsync(PostLang entity)
         {
-            var sql = "INSERT INTO PostLangs (PostId, LangId , Title, Body ,ShortDescription) VALUES (@PostId,@LangId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            var sql = "INSERT INTO PostLangs (PostId, LangId , Title, Body ,ShortDescription) VALUES (@PostId,@LangId , @Title, @Body ,@ShortDescription) ; SELECT CAST(SCOPE_IDENTITY() as int) ";
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QuerySingleAsync<int>(sql, entity);
@@ -33,7 +33,7 @@ namespace server.DataAccess.Repositories
         public async Task<int> DeleteAsync(int id)
         {
             var sql = "DELETE FROM PostLangs WHERE Id = @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(sql);
@@ -44,7 +44,7 @@ namespace server.DataAccess.Repositories
         public async Task<IReadOnlyList<PostLang>> GetAllAsync()
         {
             var query = "SELECT * FROM PostLangs ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryAsync<PostLang>(query);
@@ -55,7 +55,7 @@ namespace server.DataAccess.Repositories
         public async Task<PostLang> GetByIdAsync(int id)
         {
             var query = "SELECT * FROM PostLangs WHERE Id = @Id";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QuerySingleOrDefaultAsync<PostLang>(query, new {Id = id});
@@ -66,7 +66,7 @@ namespace server.DataAccess.Repositories
         public async Task<PostLang> UpdateAsync(PostLang entity)
         {
             var sql = "UPDATE PostLangs SET PostId = @PostId, LangId = @LangId , Title = @Title, Body=@Body ,ShortDescription=@ShortDescription WHERE Id=@Id ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.ExecuteAsync(sql,entity);

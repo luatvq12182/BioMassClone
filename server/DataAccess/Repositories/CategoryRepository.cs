@@ -1,5 +1,5 @@
 ﻿using Dapper;
-using MySqlConnector;
+using Microsoft.Data.SqlClient;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
@@ -13,7 +13,7 @@ namespace server.DataAccess.Repositories
         public Task<int> DeleteTransactionalAsync(int id);
         public Task<IReadOnlyList<CategoryModel>> GetAll();
     }
-    public class CategoryRepository :  ICategoryRepository 
+    public class CategoryRepository : ICategoryRepository
     {
         private readonly IConfiguration _configuration;
         private readonly DbSession _session;
@@ -24,9 +24,9 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Category> AddAsync(Category entity)
         {
-            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT CAST(SCOPE_IDENTITY() as int) ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QuerySingleAsync<int>(sql, entity);
@@ -37,24 +37,21 @@ namespace server.DataAccess.Repositories
 
         public async Task<Category> AddTransactionalAsync(Category entity)
         {
-            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT LAST_INSERT_ID() ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
-            {
-                connection.Open();
-                var result = await connection.QuerySingleAsync<int>(sql, entity);
-                entity.Id = result;
-                return entity;
-            }
+            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT CAST(SCOPE_IDENTITY() as int) ";
+
+            var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
+            entity.Id = result;
+            return entity;
         }
 
         public async Task<int> DeleteAsync(int id)
         {
             var sql = "DELETE FROM Categories WHERE Id = @Id";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.ExecuteAsync(sql, new {Id = id});
+                var result = await connection.ExecuteAsync(sql, new { Id = id });
                 return result;
             }
         }
@@ -63,19 +60,16 @@ namespace server.DataAccess.Repositories
         {
             var sql = "DELETE FROM Categories WHERE Id = @Id";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
-            {
-                connection.Open();
-                var result = await connection.ExecuteAsync(sql, new { Id = id } , _session.Transaction);
-                return result;
-            }
+            var result = await _session.Connection.ExecuteAsync(sql, new { Id = id }, _session.Transaction);
+            return result;
+
         }
 
         public async Task<IReadOnlyList<CategoryModel>> GetAll()
         {
             var query = "SELECT * FROM Categories ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryAsync<CategoryModel>(query);
@@ -87,10 +81,10 @@ namespace server.DataAccess.Repositories
         {
             var query = "SELECT * FROM Categories WHERE Id = @Id ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.QuerySingleOrDefaultAsync<Category>(query,new {Id = id});
+                var result = await connection.QuerySingleOrDefaultAsync<Category>(query, new { Id = id });
                 return result;
             }
         }
@@ -99,11 +93,11 @@ namespace server.DataAccess.Repositories
         {
             var sql = "UPDATE Categories  SET Slug=@Slug , Name = @Name WHERE Id = @Id ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.ExecuteAsync(sql,entity);
-                if(result >0)
+                var result = await connection.ExecuteAsync(sql, entity);
+                if (result > 0)
                 {
                     return entity;
                 }
@@ -111,11 +105,11 @@ namespace server.DataAccess.Repositories
             }
         }
 
-        public async Task<IReadOnlyList<Category>>GetAllAsync()
+        public async Task<IReadOnlyList<Category>> GetAllAsync()
         {
             var query = "SELECT * FROM Categories ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 var result = await connection.QueryAsync<Category>(query);
