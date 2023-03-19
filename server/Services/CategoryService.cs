@@ -84,23 +84,29 @@ namespace server.Services
         public async Task<IReadOnlyList<CategoryModel>> InsertCategoryTransactional(IReadOnlyList<CategoryModel> model)
         {
             var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
-            if(standardItem != null)
+            try
             {
-                var insertedCategory =   await _unit.Category.AddTransactionalAsync(new Category {Name = standardItem.Name, Slug = standardItem.Slug });
-                var spescificItems = model.Where(x => x.LanguageId > 0).ToList();
-                if(spescificItems != null && spescificItems.Any())
+                if (standardItem != null)
                 {
-                    foreach (var item in spescificItems)
+                    var insertedCategory = await _unit.Category.AddAsync(new Category { Name = standardItem.Name, Slug = standardItem.Slug });
+                    var spescificItems = model.Where(x => x.LanguageId > 0).ToList();
+
+                    if (spescificItems != null && spescificItems.Any())
                     {
-                        await _unit.CatLang.AddTransactionalAsync(new CatLang {CategoryId = insertedCategory.Id,  LanguageId = item.LanguageId.Value, Name = item.Name, Slug = item.Slug });
-                    }                  
-                }
-                if( await _unit.CommitThings())
-                {
+                        foreach (var item in spescificItems)
+                        {
+                            await _unit.CatLang.AddAsync(new CatLang { CategoryId = insertedCategory.Id, LanguageId = item.LanguageId.Value, Name = item.Name, Slug = item.Slug });
+                        }
+                    }
+
                     return model;
+                    
                 }
             }
-            return null;
+            catch(Exception ex) { }
+            {
+                return null;
+            }         
 
         }
 

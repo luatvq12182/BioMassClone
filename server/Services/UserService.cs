@@ -1,6 +1,5 @@
 ﻿using server.DataAccess.Common;
 using server.DataAccess.Entities;
-using server.DataAccess.Repositories;
 using server.ViewModel.Users;
 
 namespace server.Services
@@ -18,9 +17,9 @@ namespace server.Services
             _unit = unitOfWork;
         }
 
-        public Task<User> AddAsync(User entity)
+        public async Task<User> AddAsync(User entity)
         {
-            throw new NotImplementedException();
+            return await _unit.User.AddAsync(entity);
         }
 
         public async Task<bool> AlreadyExist(RegisterModel model)

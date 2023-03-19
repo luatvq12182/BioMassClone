@@ -17,9 +17,9 @@ namespace server.Services
             _unit = unitOfWork;
         }
 
-        public Task<Image> AddAsync(Image entity)
+        public async Task<Image> AddAsync(Image entity)
         {
-            throw new NotImplementedException();
+            return await _unit.Image.AddAsync(entity);
         }
 
         public Task<int> DeleteAsync(int id)

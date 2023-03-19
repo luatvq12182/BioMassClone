@@ -1,12 +1,14 @@
 ﻿using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Repositories;
+using server.ViewModel.Commons;
+using server.ViewModel.Posts;
 
 namespace server.Services
 {
     public interface IPostService : IGenericService<Post>
     {
-
+        public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
     }
     public class PostService : IPostService
     {
@@ -16,24 +18,29 @@ namespace server.Services
             _unit= unitOfWork;
         }
 
-        public Task<Post> AddAsync(Post entity)
+        public async Task<Post> AddAsync(Post entity)
         {
-            throw new NotImplementedException();
+            return await _unit.Post.AddAsync(entity);
         }
 
-        public Task<int> DeleteAsync(int id)
+        public async Task<int> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            return await (_unit.Post.DeleteAsync(id));
         }
 
-        public Task<IReadOnlyList<Post>> GetAllAsync()
+        public async Task<IReadOnlyList<Post>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _unit.Post.GetAllAsync();
         }
 
-        public Task<Post> GetByIdAsync(int id)
+        public async Task<Post> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _unit.Post.GetByIdAsync(id);
+        }
+
+        public async Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model)
+        {
+            return await _unit.Post.GetPagedPost(model);
         }
 
         public Task<Post> UpdateAsync(Post entity)

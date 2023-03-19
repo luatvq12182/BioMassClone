@@ -24,7 +24,7 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Category> AddAsync(Category entity)
         {
-            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,Name) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT LAST_INSERT_ID() ";
 
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
@@ -38,11 +38,10 @@ namespace server.DataAccess.Repositories
         public async Task<Category> AddTransactionalAsync(Category entity)
         {
             var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT LAST_INSERT_ID() ";
-
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
+                var result = await connection.QuerySingleAsync<int>(sql, entity);
                 entity.Id = result;
                 return entity;
             }

@@ -3,11 +3,14 @@ using MySqlConnector;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
+using server.ViewModel.Commons;
+using server.ViewModel.Posts;
 
 namespace server.DataAccess.Repositories
 {
     public interface IPostRepository : IGenericRepository<Post>
     {
+        public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
     }
     public class PostRepository :  IPostRepository
     {
@@ -20,7 +23,7 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Post> AddAsync(Post entity)
         {
-            var sql = "INSERT INTO Posts (CategoryId,Title, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Posts (CategoryId,Title, Thumbnail, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title,@Thumbnail, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
@@ -63,9 +66,28 @@ namespace server.DataAccess.Repositories
             }
         }
 
+        public  async Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model)
+        {
+            List<PostModel> items;
+            var offSet = model.Pagesize*(model.PageNumber -1);
+            int totalCount;
+            var query = "Select * From Posts LIMIT @PageSize  OFFSET @OFFSET ; SELECT COUNT(*) FROM Posts ";
+
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                connection.Open();
+                using (var multi = await connection.QueryMultipleAsync(query, new { @PageSize = model.Pagesize, @OFFSET = offSet}))
+                {
+                    items = multi.Read<PostModel>().ToList();
+                    totalCount = multi.ReadFirst<int>();
+                }
+            }
+            return new PaginatedList<PostModel>(items , totalCount ,model.PageNumber,model.Pagesize);
+        }
+
         public async Task<Post> UpdateAsync(Post entity)
         {
-            var sql = "UPDATE Posts SET CategoryId = @CategoryId , Title = @Title, Body=@Body ,ShortDescription=@ShortDescription ,Views = @Views , Author=@Author WHERE Id=@Id ";
+            var sql = "UPDATE Posts SET CategoryId = @CategoryId , Title = @Title, Thumbnail = @Thumbnail, Body=@Body ,ShortDescription=@ShortDescription ,Views = @Views , Author=@Author WHERE Id=@Id ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();

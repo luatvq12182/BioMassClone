@@ -38,13 +38,11 @@ namespace server.DataAccess.Repositories
         public async Task<CatLang> AddTransactionalAsync(CatLang entity)
         {
             var sql = "INSERT INTO CatLangs (CategoryId, LanguageId, Slug, Name) VALUES (@CategoryId, @LanguageId, @Slug, @Name); SELECT LAST_INSERT_ID() ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
-            {
-                connection.Open();
-                var result = await connection.QuerySingleAsync<int>(sql, entity,_session.Transaction);
-                entity.Id = result;
-                return entity;
-            }
+
+            var result = await _session.Connection.QuerySingleAsync<int>(sql, entity,_session.Transaction);
+            entity.Id = result;
+            return entity;
+            
         }
 
         public async Task<int> DeleteAsync(int id)
@@ -94,7 +92,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<IReadOnlyList<CategoryModel>> GetByLanguageId(int id)
         {
-            var query = "SELECT * FROM CatLangs WHERE LangId = @LangId";
+            var query = "SELECT * FROM CatLangs WHERE LanguageId = @LangId";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();

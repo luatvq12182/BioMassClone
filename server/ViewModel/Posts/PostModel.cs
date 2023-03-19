@@ -1,6 +1,8 @@
-﻿namespace server.DataAccess.Entities
+﻿using server.DataAccess.Entities;
+
+namespace server.ViewModel.Posts
 {
-    public class Post
+    public class PostModel
     {
         public int Id { get; set; }
         public int CategoryId { get; set; }
