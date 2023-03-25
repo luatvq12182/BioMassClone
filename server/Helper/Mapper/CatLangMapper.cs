@@ -9,6 +9,7 @@ namespace server.Helper.Mapper
         {
             return new CatLang
             {
+                Id= model.Id,
                 LanguageId = model.LanguageId.Value,
                 Name= model.Name,
                 Slug= model.Slug
@@ -18,6 +19,7 @@ namespace server.Helper.Mapper
         {
             return new CategoryModel
             {
+                Id= entity.Id,
                 LanguageId = entity.LanguageId,
                 Name = entity.Name,
                 Slug = entity.Slug

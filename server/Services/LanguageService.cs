@@ -7,7 +7,7 @@ namespace server.Services
 {
     public interface ILanguageService : IGenericService<Language>
     {
-        public Language GetByCode(string code);
+        public Task<Language> GetByCode(string code);
         public bool AlreadyExist(LanguageModel language, out string message);
     }
     public class LanguageService : ILanguageService
@@ -53,9 +53,5 @@ namespace server.Services
             return await _unit.Language.GetByCode(code);
         }
 
-        Language ILanguageService.GetByCode(string code)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

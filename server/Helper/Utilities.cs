@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using server.DataAccess.Entities;
+using server.ViewModel.Posts;
+using System.Text.RegularExpressions;
 
 namespace server.Helper
 {
@@ -70,6 +72,22 @@ namespace server.Helper
                 }
             }
             return url;
+        }
+        public static PostModel MapToPostModel(Post post , PostLang postLang)
+        {
+            return new PostModel
+            {
+                Id = postLang.Id,
+                CategoryId = post.CategoryId,
+                LanguageId = postLang.LangId,
+                Thumbnail = post.Thumbnail,
+                Title = postLang.Title,
+                Body = postLang.Body,
+                ShortDescription = postLang.ShortDescription,
+                Author = post.Author,
+                CreatedDate = post.CreatedDate,
+                Views = post.Views
+            };
         }
     }
 }

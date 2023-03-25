@@ -9,6 +9,7 @@ namespace server.Helper.Mapper
         {
             return new Category
             {
+                Id = model.Id,
                 Name = model.Name,
                 Slug = model.Slug
             };
@@ -17,6 +18,7 @@ namespace server.Helper.Mapper
         {
             return new CategoryModel
             {
+                Id= entity.Id,
                 Name = entity.Name,
                 Slug = entity.Slug
             };

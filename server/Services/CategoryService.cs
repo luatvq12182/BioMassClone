@@ -2,6 +2,7 @@
 using server.DataAccess.Entities;
 using server.Helper.Mapper;
 using server.ViewModel.Categories;
+using static Dapper.SqlMapper;
 
 
 namespace server.Services
@@ -13,6 +14,7 @@ namespace server.Services
         Task<bool> Remove(int id);
         Task<bool> Edit(int id, IReadOnlyList<CategoryModel> model);
         Task<IReadOnlyList<CategoryModel>> GetByLanguageId(int? languageId);
+        Task<IReadOnlyList<CategoryModel>> UpdateTransactionalAsync(IReadOnlyList<CategoryModel> model);
     }
     public class CategoryService : ICategoryService
     {
@@ -127,6 +129,27 @@ namespace server.Services
         public Task<Category> UpdateAsync(Category entity)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IReadOnlyList<CategoryModel>> UpdateTransactionalAsync(IReadOnlyList<CategoryModel> model)
+        {
+            var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
+            await _unit.Category.UpdateTransactionalAsync(standardItem.MapToCategoryEntity());
+            var specificItems = model.Where(x => x.LanguageId.HasValue && x.LanguageId.Value > 0).ToList();
+            
+            if (specificItems != null && specificItems.Any())
+            {
+                foreach (var catLang in specificItems)
+                {
+                    await _unit.CatLang.UpdateTransactionalAsync(catLang.MapToCatLangEntity());
+                }
+            }
+            if (await _unit.CommitThings())
+            {
+                return model;
+            }
+            else
+                return null;
         }
     }
 }

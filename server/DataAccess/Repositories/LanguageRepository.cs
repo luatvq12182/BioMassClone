@@ -69,7 +69,13 @@ namespace server.DataAccess.Repositories
 
         public async Task<Language> GetByCode(string code)
         {
-            throw new NotImplementedException();
+            var query = " SELECT * FROM Languages WHERE Code = @Code ";
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                var result = await connection.QueryFirstOrDefaultAsync<Language>(query, new { Code = code});
+                return result;
+            }
         }
 
         public async Task<Language> GetByIdAsync(int id)
