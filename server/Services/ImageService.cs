@@ -17,9 +17,9 @@ namespace server.Services
             _unit = unitOfWork;
         }
 
-        public Task<Image> AddAsync(Image entity)
+        public async Task<Image> AddAsync(Image entity)
         {
-            throw new NotImplementedException();
+            return await _unit.Image.AddAsync(entity);
         }
 
         public Task<int> DeleteAsync(int id)
@@ -27,14 +27,14 @@ namespace server.Services
             throw new NotImplementedException();
         }
 
-        public Task<IReadOnlyList<Image>> GetAllAsync()
+        public async Task<IReadOnlyList<Image>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return await _unit.Image.GetAllAsync();
         }
 
-        public Task<Image> GetByIdAsync(int id)
+        public async Task<Image> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _unit.Image.GetByIdAsync(id);
         }
 
         public Task<Image> UpdateAsync(Image entity)

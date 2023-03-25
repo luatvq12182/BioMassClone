@@ -3,11 +3,16 @@ using MySqlConnector;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
+using server.ViewModel.Commons;
+using server.ViewModel.Posts;
+using static Dapper.SqlMapper;
 
 namespace server.DataAccess.Repositories
 {
     public interface IPostRepository : IGenericRepository<Post>
     {
+        public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
+        public Task<Post> AddTransactionalAsync (Post post);
     }
     public class PostRepository :  IPostRepository
     {
@@ -77,6 +82,33 @@ namespace server.DataAccess.Repositories
 
                 return null;
             }
+        }
+        public async Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model)
+        {
+            List<PostModel> items;
+            var offSet = model.Pagesize * (model.PageNumber - 1);
+            int totalCount;
+            var query = "Select * From Posts LIMIT @PageSize  OFFSET @Pagesize * (@PageNumber -1) ; SELECT COUNT(*) FROM Posts ";
+
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                using (var multi = await connection.QueryMultipleAsync(query, model))
+                {
+                    items = multi.Read<PostModel>().ToList();
+                    totalCount = multi.ReadFirst<int>();
+                }
+            }
+            return new PaginatedList<PostModel>(items, totalCount, model.PageNumber, model.Pagesize);
+        }
+
+        public async Task<Post> AddTransactionalAsync(Post entity)
+        {
+            var sql = "INSERT INTO Posts (CategoryId,Title, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
+
+            var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
+            entity.Id = result;
+            return entity;
         }
     }
 }

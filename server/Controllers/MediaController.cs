@@ -8,7 +8,7 @@ using server.DataAccess.Entities;
 namespace server.Controllers
 {
     [ApiController]
-    [Authorize]
+    //[Authorize]
     [Route("api/media")]
     public class MediaController : ControllerBase
     {
@@ -19,6 +19,7 @@ namespace server.Controllers
             _imageService = imageService;
             _env = env;
         }
+        [Authorize]
         [HttpPost("upload")]
         public async Task<IActionResult> Upload()
         {

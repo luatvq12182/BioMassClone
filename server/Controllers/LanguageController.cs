@@ -8,7 +8,7 @@ using MySqlConnector;
 namespace server.Controllers
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("api/languages")]
     public class LanguageController : ControllerBase
     {

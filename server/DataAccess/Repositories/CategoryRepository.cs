@@ -12,6 +12,7 @@ namespace server.DataAccess.Repositories
         public Task<Category> AddTransactionalAsync(Category entity);
         public Task<int> DeleteTransactionalAsync(int id);
         public Task<IReadOnlyList<CategoryModel>> GetAll();
+        public Task<Category> UpdateTransactionalAsync(Category entity);
     }
     public class CategoryRepository :  ICategoryRepository 
     {
@@ -39,13 +40,9 @@ namespace server.DataAccess.Repositories
         {
             var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT LAST_INSERT_ID() ";
 
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
-            {
-                connection.Open();
-                var result = await connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
-                entity.Id = result;
-                return entity;
-            }
+            var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
+            entity.Id = result;
+            return entity;
         }
 
         public async Task<int> DeleteAsync(int id)
@@ -122,6 +119,14 @@ namespace server.DataAccess.Repositories
                 var result = await connection.QueryAsync<Category>(query);
                 return result.ToList();
             }
+        }
+
+        public async Task<Category> UpdateTransactionalAsync(Category entity)
+        {
+            var sql = "UPDATE Categories  SET Slug=@Slug , Name = @Name WHERE Id = @Id ";
+            var result = await _session.Connection.ExecuteAsync(sql, entity, _session.Transaction);
+            return result > 0 ? entity : null;
+
         }
     }
 }

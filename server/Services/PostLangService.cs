@@ -6,7 +6,8 @@ namespace server.Services
 {
     public interface IPostLangService : IGenericService<PostLang>
     {
-
+        Task<PostLang> GetBySpecificLang(int postId, int langId);
+        Task<IReadOnlyList<PostLang>> GetByPostId(int id);
     }
     public class PostLangService :  IPostLangService
     {
@@ -34,6 +35,16 @@ namespace server.Services
         public Task<PostLang> GetByIdAsync(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IReadOnlyList<PostLang>> GetByPostId(int id)
+        {
+            return await _unit.PostLang.GetPostId(id);
+        }
+
+        public  async Task<PostLang> GetBySpecificLang(int postId, int langId)
+        {
+            return await _unit.PostLang.GetBySpecificLang(postId, langId);
         }
 
         public Task<PostLang> UpdateAsync(PostLang entity)
