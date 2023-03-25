@@ -24,7 +24,7 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Category> AddAsync(Category entity)
         {
-            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,Name) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT LAST_INSERT_ID() ";
 
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
