@@ -20,7 +20,7 @@ public sealed class DbSession : IDisposable
         {
             if (_Connection == null)
             {
-                _Connection = new MySqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+                _Connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn"));
                 _Connection.Open();
                 Transaction = _Connection.BeginTransaction(IsolationLevel.ReadCommitted);
             }
