@@ -88,18 +88,18 @@ namespace server.Services
             {
                 if (standardItem != null)
                 {
-                    var insertedCategory = await _unit.Category.AddAsync(new Category { Name = standardItem.Name, Slug = standardItem.Slug });
+                    var insertedCategory = await _unit.Category.AddTransactionalAsync(new Category { Name = standardItem.Name, Slug = standardItem.Slug });
                     var spescificItems = model.Where(x => x.LanguageId > 0).ToList();
 
                     if (spescificItems != null && spescificItems.Any())
                     {
                         foreach (var item in spescificItems)
                         {
-                            await _unit.CatLang.AddAsync(new CatLang { CategoryId = insertedCategory.Id, LanguageId = item.LanguageId.Value, Name = item.Name, Slug = item.Slug });
+                            await _unit.CatLang.AddTransactionalAsync(new CatLang { CategoryId = insertedCategory.Id, LanguageId = item.LanguageId.Value, Name = item.Name, Slug = item.Slug });
                         }
                     }
-
-                    return model;
+                    if( await _unit.CommitThings())
+                        return model;
                     
                 }
             }

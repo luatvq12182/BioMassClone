@@ -73,7 +73,7 @@ namespace server.DataAccess.Repositories
             int totalCount;
             var query = "Select * From Posts LIMIT @PageSize  OFFSET @OFFSET ; SELECT COUNT(*) FROM Posts ";
 
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
                 using (var multi = await connection.QueryMultipleAsync(query, new { @PageSize = model.Pagesize, @OFFSET = offSet}))
