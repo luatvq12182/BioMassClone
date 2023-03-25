@@ -94,7 +94,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<IReadOnlyList<CategoryModel>> GetByLanguageId(int id)
         {
-            var query = "SELECT * FROM CatLangs WHERE LangId = @LangId";
+            var query = "SELECT * FROM CatLangs WHERE LanguageId = @LangId";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
