@@ -51,6 +51,23 @@ const Sidebar = ({ isOpen, onHide }: Props) => {
                     }}
                 >
                     <li>
+                        <Link
+                            onClick={onHide}
+                            to='/admin/category'
+                        >
+                            Category
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            onClick={onHide}
+                            to='/admin/media'
+                        >
+                            Media
+                        </Link>
+                    </li>
+
+                    {/* <li>
                         <span className='menu-child-category'>Category</span>
                         <ol>
                             <li>
@@ -76,7 +93,7 @@ const Sidebar = ({ isOpen, onHide }: Props) => {
                                 </Link>
                             </li>
                         </ol>
-                    </li>
+                    </li> */}
 
                     {/* <li>
                         <span className='menu-child-category'>Article</span>
