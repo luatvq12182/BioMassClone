@@ -73,7 +73,7 @@ const Table = ({ langCode, onOpenUpdateDialog }: Props) => {
                                         <Button
                                             disabled={isDeleting}
                                             onClick={() =>
-                                                handleClickDelete(e.id)
+                                                handleClickDelete(e.categoryId ||  e.id)
                                             }
                                             icon='pi pi-trash'
                                             rounded

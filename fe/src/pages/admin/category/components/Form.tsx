@@ -19,6 +19,7 @@ const Form = ({ languageId, onChange, onSubmit, loading, data }: Props) => {
             <div className='flex flex-col gap-1'>
                 <label htmlFor='name'>Name</label>
                 <InputText
+                    autoFocus
                     id='name'
                     aria-describedby='name-help'
                     onChange={onChange(languageId)("name")}

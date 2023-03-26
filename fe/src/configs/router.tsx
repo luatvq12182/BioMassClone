@@ -5,6 +5,7 @@ import AdminLayout from "@/layouts/admin";
 import Category from "@/pages/admin/category";
 import Login from "@/pages/admin/login";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Media from "@/pages/admin/media";
 
 const router = createBrowserRouter([
     {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
             {
                 path: "category",
                 element: <Category />,
+            },
+            {
+                path: "media",
+                element: <Media />,
             },
         ],
     },
