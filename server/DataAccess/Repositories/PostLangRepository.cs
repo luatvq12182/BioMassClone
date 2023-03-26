@@ -12,6 +12,7 @@ namespace server.DataAccess.Repositories
         public Task<IReadOnlyList<PostLang>> GetPostId(int postId);
         public Task<PostLang> AddTransactionalAsync(PostLang entity);
         public Task<IReadOnlyList<PostLang>> GetAllBySpecificLang(int languageId);
+        public Task<PostLang> UpdateTransactional (PostLang entity);
     }
     public class PostLangRepository :IPostLangRepository
     {
@@ -125,6 +126,17 @@ namespace server.DataAccess.Repositories
 
                 return null;
             }
+        }
+
+        public async Task<PostLang> UpdateTransactional(PostLang entity)
+        {
+            var sql = "UPDATE PostLangs SET Title = @Title, Body=@Body ,ShortDescription=@ShortDescription WHERE Id=@Id ";
+            var result = await _session.Connection.ExecuteAsync(sql, entity,_session.Transaction);
+            if(result > 0)
+            {
+                return entity;
+            }
+            return null; 
         }
     }
 }

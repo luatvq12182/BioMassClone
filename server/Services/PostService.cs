@@ -1,6 +1,5 @@
 ﻿using server.DataAccess.Common;
 using server.DataAccess.Entities;
-using server.DataAccess.Repositories;
 using server.Helper;
 using server.Helper.Mapper;
 using server.ViewModel.Commons;
@@ -12,6 +11,7 @@ namespace server.Services
     {
         public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
         public Task<IReadOnlyList<PostModel>> InsertTransactional(IReadOnlyList<PostModel> model);
+        public Task<IReadOnlyList<PostModel>> UpDateTransactional (IReadOnlyList<PostModel> model);
     }
     public class PostService : IPostService
     {
@@ -92,7 +92,9 @@ namespace server.Services
                 {
                     foreach (var item in spescificItems)
                     {
-                        await _unit.PostLang.AddTransactionalAsync(new PostLang { PostId = insertedPost.Id, LangId = item.LanguageId.Value, Title = item.Title, Body = item.Body, ShortDescription = item.ShortDescription });
+                        var postLang = item.MapToPostLangEntity();
+                        postLang.PostId = standardItem.Id;
+                        await _unit.PostLang.AddTransactionalAsync(postLang);
                     }
                 }
                 if (await _unit.CommitThings())
@@ -101,6 +103,27 @@ namespace server.Services
                 }
             }
             return null;
+        }
+
+        public async Task<IReadOnlyList<PostModel>> UpDateTransactional(IReadOnlyList<PostModel> model)
+        {
+            var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
+            await _unit.Post.UpdateTransactionalAsync(standardItem.MapToEntity());
+            var specificItems = model.Where(x => x.LanguageId.HasValue && x.LanguageId.Value > 0).ToList();
+
+            if (specificItems != null && specificItems.Any())
+            {
+                foreach (var postLang in specificItems)
+                {
+                    await _unit.PostLang.UpdateTransactional(postLang.MapToPostLangEntity());
+                }
+            }
+            if (await _unit.CommitThings())
+            {
+                return model;
+            }
+            else
+                return null;
         }
     }
 }

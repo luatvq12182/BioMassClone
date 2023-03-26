@@ -76,5 +76,13 @@ namespace server.Controllers
             var data = await _imageService.GetByIdAsync(id);
             return Ok(data);
         }
+        [HttpPost("add-to-slider")]
+        public async Task<IActionResult> AddToSlider([FromBody] List<int> ids)
+        {
+            if(await _imageService.AddToSlider(ids))
+                return Ok();
+            else
+                return BadRequest();
+        }
     }
 }

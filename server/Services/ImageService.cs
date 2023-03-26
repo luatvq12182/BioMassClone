@@ -6,7 +6,7 @@ namespace server.Services
 {
     public interface IImageService : IGenericService<Image>
     {
-
+        public Task<bool> AddToSlider(List<int> ids);
     }
     public class ImageService : IImageService
     {
@@ -20,6 +20,17 @@ namespace server.Services
         public async Task<Image> AddAsync(Image entity)
         {
             return await _unit.Image.AddAsync(entity);
+        }
+
+        public async Task<bool> AddToSlider(List<int> ids)
+        {
+            bool isSuccessful = true;
+            foreach(var imageId in ids)
+            {
+                isSuccessful &= await _unit.Image.AddToSlider(imageId);
+            }
+            return isSuccessful;
+
         }
 
         public Task<int> DeleteAsync(int id)

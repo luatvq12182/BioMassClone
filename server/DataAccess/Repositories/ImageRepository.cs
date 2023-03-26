@@ -3,12 +3,12 @@ using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
 using Dapper;
 using MySqlConnector;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace server.DataAccess.Repositories
 {
     public interface IImageRepository : IGenericRepository<Image>
     {
+        public Task<bool> AddToSlider(int id);
     }
     public class ImageRepository : IImageRepository
     {
@@ -31,6 +31,19 @@ namespace server.DataAccess.Repositories
                 entity.Id = result;
                 return entity;
             }
+        }
+
+        public async Task<bool> AddToSlider(int id)
+        {
+            var sql = "UPDATE Images SET ShowOnSlider = 1 WHERE Id = @Id";
+            var result =  await _session.Connection.ExecuteAsync(sql, new {Id = id});
+            if(result > 0)
+            {
+                return true;
+
+            }
+            return false;
+
         }
 
         public async Task<int> DeleteAsync(int id)

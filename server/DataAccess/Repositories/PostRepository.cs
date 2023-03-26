@@ -12,9 +12,10 @@ namespace server.DataAccess.Repositories
     public interface IPostRepository : IGenericRepository<Post>
     {
         public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
-        public Task<Post> AddTransactionalAsync (Post post);
+        public Task<Post> AddTransactionalAsync(Post post);
+        public Task<Post> UpdateTransactionalAsync(Post post);
     }
-    public class PostRepository :  IPostRepository
+    public class PostRepository : IPostRepository
     {
         private readonly IConfiguration _configuration;
         private readonly DbSession _session;
@@ -93,7 +94,7 @@ namespace server.DataAccess.Repositories
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                using (var multi = await connection.QueryMultipleAsync(query, new {PageSize = model.Pagesize, OffSet= offSet}))
+                using (var multi = await connection.QueryMultipleAsync(query, new { PageSize = model.Pagesize, OffSet = offSet }))
                 {
                     items = multi.Read<PostModel>().ToList();
                     totalCount = multi.ReadFirst<int>();
@@ -109,6 +110,17 @@ namespace server.DataAccess.Repositories
             var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
             entity.Id = result;
             return entity;
+        }
+
+        public async Task<Post> UpdateTransactionalAsync(Post post)
+        {
+            var sql = "UPDATE Posts SET CategoryId = @CategoryId , Title = @Title, Body=@Body ,ShortDescription=@ShortDescription ,Views = @Views , Author=@Author WHERE Id=@Id ";
+            var result = await _session.Connection.ExecuteAsync(sql, post, _session.Transaction);
+            if (result > 0)
+            {
+                return post;
+            }
+            return null;
         }
     }
 }
