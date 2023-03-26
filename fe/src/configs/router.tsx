@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import AdminLayout from "@/layouts/admin";
 
 import Category from "@/pages/admin/category";
+import Login from "@/pages/admin/login";
 
 const router = createBrowserRouter([
     {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
             },
         ],
     },
+    {
+        path: "/login",
+        element: <Login />
+    }
 ]);
 
 export default router;

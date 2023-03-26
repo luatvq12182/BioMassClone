@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*,
+input,
+textarea,
+select {
+    font-family: "Inter", "Quicksand", "Comforter", "JetBrains Mono", sans-serif;
+}
+
+.layout-topbar {
+    padding: 0;
+    height: 4rem;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1100;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.layout-topbar.layout-topbar-sticky {
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+.layout-topbar .layout-topbar-inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+}
+
+.layout-content {
+    padding-top: 4rem;
+}
+
+.layout-content .layout-content-inner {
+    padding: 2rem 4rem;
+}
