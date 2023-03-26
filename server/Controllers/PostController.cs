@@ -59,7 +59,7 @@ namespace server.Controllers
                     var result = new List<PostModel>();
                     result.Add(post.MapToModel());
                     var postLangs = await _postLangService.GetByPostId(id);
-                    if(postLangs == null && postLangs.Any())
+                    if(postLangs != null && postLangs.Any())
                     {
                         foreach(var postLang in postLangs)
                         {

@@ -78,6 +78,7 @@ namespace server.Helper
             return new PostModel
             {
                 Id = postLang.Id,
+                PostId = post.Id,
                 CategoryId = post.CategoryId,
                 LanguageId = postLang.LangId,
                 Thumbnail = post.Thumbnail,

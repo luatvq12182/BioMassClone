@@ -113,7 +113,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<PostLang> UpdateAsync(PostLang entity)
         {
-            var sql = "UPDATE PostLangs SET PostId = @PostId, LangId = @LangId , Title = @Title, Body=@Body ,ShortDescription=@ShortDescription WHERE Id=@Id ";
+            var sql = "UPDATE PostLangs SET Title = @Title, Body=@Body ,ShortDescription=@ShortDescription WHERE Id=@Id ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();

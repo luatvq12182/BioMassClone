@@ -3,7 +3,7 @@
     public class PostModel
     {
         public int Id { get; set; }
-        public int? PostLangId { get; set; }
+        public int PostId { get; set; }
         public int? LanguageId { get; set; }
         public int? CategoryId { get; set; }
         public string Thumbnail { get; set; }

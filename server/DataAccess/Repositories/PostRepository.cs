@@ -88,12 +88,12 @@ namespace server.DataAccess.Repositories
             List<PostModel> items;
             var offSet = model.Pagesize * (model.PageNumber - 1);
             int totalCount;
-            var query = "Select * From Posts LIMIT @PageSize  OFFSET @Pagesize * (@PageNumber -1) ; SELECT COUNT(*) FROM Posts ";
+            var query = "Select * From Posts LIMIT @PageSize  OFFSET @OffSet ; SELECT COUNT(*) FROM Posts ";
 
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                using (var multi = await connection.QueryMultipleAsync(query, model))
+                using (var multi = await connection.QueryMultipleAsync(query, new {PageSize = model.Pagesize, OffSet= offSet}))
                 {
                     items = multi.Read<PostModel>().ToList();
                     totalCount = multi.ReadFirst<int>();
