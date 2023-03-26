@@ -4,5 +4,6 @@ namespace server.ViewModel.Posts
 {
     public class PostSearchModel : Pagination
     {
+        public string? Lang { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Repositories;
+using server.Helper;
 using server.Helper.Mapper;
 using server.ViewModel.Commons;
 using server.ViewModel.Posts;
@@ -46,6 +47,37 @@ namespace server.Services
         }
         public async Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model)
         {
+            if(!string.IsNullOrEmpty(model.Lang))
+            {
+                var language = await _unit.Language.GetByCode(model.Lang);
+                if(language != null)
+                {
+                    List<PostModel> Items = new List<PostModel>();
+                    int TotalCount;
+                    var postLangs = await _unit.PostLang.GetAllBySpecificLang(language.Id);
+                    var posts = await _unit.Post.GetAllAsync();
+                    if(posts!= null && posts.Any())
+                    {
+                        foreach(var post in posts)
+                        {
+                            if(postLangs != null && postLangs.Any())
+                            {
+                                foreach(var postLang in postLangs)
+                                {
+                                    if(postLang.PostId == post.Id)
+                                    {
+                                        var postModel = Utilities.MapToPostModel(post, postLang);
+                                        Items.Add(postModel);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    TotalCount = Items.Count;
+                    return new PaginatedList<PostModel>(Items,TotalCount,model.PageNumber,model.Pagesize);
+                }
+
+            }
             return await _unit.Post.GetPagedPost(model);
         }
 

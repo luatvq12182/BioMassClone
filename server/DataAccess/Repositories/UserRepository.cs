@@ -31,12 +31,20 @@ namespace server.DataAccess.Repositories
             {
                 connection.Open();
                 var result = await connection.QueryFirstOrDefaultAsync<User>(query, new { Identify = model.Identify });
-                var isValid = BC.Verify(model.Password, result.Password);
-                if (!isValid)
+                if(result != null)
+                {
+                    var isValid = BC.Verify(model.Password, result.Password);
+                    if (!isValid)
+                    {
+                        return null;
+                    }
+                    return result;
+                }
+                else
                 {
                     return null;
-                }               
-                return result;
+                }
+
             }
 
 

@@ -11,6 +11,7 @@ namespace server.DataAccess.Repositories
         public Task<PostLang> GetBySpecificLang(int postId, int languageId);
         public Task<IReadOnlyList<PostLang>> GetPostId(int postId);
         public Task<PostLang> AddTransactionalAsync(PostLang entity);
+        public Task<IReadOnlyList<PostLang>> GetAllBySpecificLang(int languageId);
     }
     public class PostLangRepository :IPostLangRepository
     {
@@ -70,6 +71,11 @@ namespace server.DataAccess.Repositories
                 var result = await connection.QueryAsync<PostLang>(query);
                 return result.ToList();
             }
+        }
+
+        public Task<IReadOnlyList<PostLang>> GetAllBySpecificLang(int languageId)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<PostLang> GetByIdAsync(int id)
