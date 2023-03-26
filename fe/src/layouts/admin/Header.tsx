@@ -18,7 +18,7 @@ const Header = ({ onOpenSidebar }: Props) => {
                         size="large"
                     />
                     
-                    <h2>Bio Mass</h2>
+                    <h2>Green way</h2>
                 </div>
             </div>
         </div>

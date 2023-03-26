@@ -11,6 +11,7 @@ import {
     useCreateCategory,
 } from "@/modules/category";
 import { ILang, useLangs } from "@/modules/lang";
+import UpdateDialog from "./components/UpdateDialog";
 
 const Category = () => {
     const queryClient = useQueryClient();
@@ -26,6 +27,9 @@ const Category = () => {
         },
     });
     const [activeIndex, setActiveIndex] = useState<number>(0);
+    const [isOpenUpdateDialog, setIsOpenUpdateDialog] =
+        useState<boolean>(false);
+    const [idSelected, setIdSelected] = useState<number | null>(null);
 
     useEffect(() => {
         queryClient.invalidateQueries([
@@ -70,8 +74,20 @@ const Category = () => {
         }
     };
 
+    const handleOpenUpdateDialog = (id: number) => {
+        setIdSelected(id);
+        setIsOpenUpdateDialog(true);
+    };
+
     return (
         <div className='grid grid-cols-3 gap-4'>
+            <UpdateDialog
+                id={idSelected || -1}
+                activeIndex={activeIndex}
+                isOpen={isOpenUpdateDialog}
+                onHide={() => setIsOpenUpdateDialog(false)}
+            />
+
             <div>
                 <Card title='Create category'>
                     <TabView>
@@ -120,7 +136,9 @@ const Category = () => {
                         onTabChange={(e) => setActiveIndex(e.index)}
                     >
                         <TabPanel header='Standard'>
-                            <Table />
+                            <Table
+                                onOpenUpdateDialog={handleOpenUpdateDialog}
+                            />
                         </TabPanel>
 
                         {langs?.data?.map((lang) => {
@@ -129,7 +147,12 @@ const Category = () => {
                                     key={lang.id}
                                     header={lang.name}
                                 >
-                                    <Table langCode={lang.code} />
+                                    <Table
+                                        langCode={lang.code}
+                                        onOpenUpdateDialog={
+                                            handleOpenUpdateDialog
+                                        }
+                                    />
                                 </TabPanel>
                             );
                         })}

@@ -8,7 +8,7 @@ const getCategories = (langCode?: string) => {
 };
 
 const getCategory = (id: number) => {
-    return httpClient.get<ICategory>(`/categories/${id}`);
+    return httpClient.get<ICategory[]>(`/categories/${id}`);
 };
 
 const createCategory = (payload: ICategory[]) => {

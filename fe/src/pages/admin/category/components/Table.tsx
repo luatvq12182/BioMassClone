@@ -10,9 +10,10 @@ import { showConfirm } from "@/utils";
 
 type Props = {
     langCode?: string;
+    onOpenUpdateDialog: (id: number) => void;
 };
 
-const Table = ({ langCode }: Props) => {
+const Table = ({ langCode, onOpenUpdateDialog }: Props) => {
     const { mutate: deleteCategory, isLoading: isDeleting } =
         useDeleteCategory();
 
@@ -65,6 +66,9 @@ const Table = ({ langCode }: Props) => {
                                             rounded
                                             text
                                             aria-label='Filter'
+                                            onClick={() => {
+                                                onOpenUpdateDialog(e.categoryId ||  e.id);
+                                            }}
                                         />
                                         <Button
                                             disabled={isDeleting}

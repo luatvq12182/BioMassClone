@@ -1,3 +1,4 @@
+// import { SlideMenu } from "primereact/slidemenu";
 import { Sidebar as PSidebar } from "primereact/sidebar";
 
 type Props = {
@@ -6,19 +7,41 @@ type Props = {
 };
 
 const Sidebar = ({ isOpen, onHide }: Props) => {
+    const items = [
+        {
+            label: "Category",
+            icon: "pi pi-fw pi-file",
+        },
+        {
+            label: "Media",
+            icon: "pi pi-fw pi-file",
+        },
+        {
+            label: "Article",
+            icon: "pi pi-fw pi-file",
+            items: [
+                {
+                    label: "New article",
+                    icon: "pi pi-fw pi-plus",
+                },
+                {
+                    label: "Article list",
+                    icon: "pi pi-fw pi-trash",
+                },
+            ],
+        },
+    ];
+
     return (
         <div className='card flex justify-content-center'>
             <PSidebar
                 visible={isOpen}
                 onHide={onHide}
             >
-                <h2>Sidebar</h2>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                </p>
+                {/* <SlideMenu
+                    model={items}
+                    viewportHeight={220}
+                /> */}
             </PSidebar>
         </div>
     );
