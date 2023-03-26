@@ -1,20 +1,22 @@
 import { httpClient } from "../httpClient";
 import { ICategory } from "./models";
 
-const getCategories = () => {
-    return httpClient.get<ICategory[]>("/categories");
+const getCategories = (langCode?: string) => {
+    return httpClient.get<ICategory[]>(
+        `/categories${langCode ? `?lang=${langCode}` : ""}`
+    );
 };
 
 const getCategory = (id: number) => {
     return httpClient.get<ICategory>(`/categories/${id}`);
 };
 
-const createCategory = (payload: ICategory) => {
+const createCategory = (payload: ICategory[]) => {
     return httpClient.post<ICategory>("/categories", payload);
 };
 
-const updateCategory = (payload: ICategory) => {
-    return httpClient.put(`/categories/${payload.id}`, payload);
+const updateCategory = (id: number) => (payload: ICategory[]) => {
+    return httpClient.put(`/categories/${id}`, payload);
 };
 
 const deleteCategory = (id: number) => {

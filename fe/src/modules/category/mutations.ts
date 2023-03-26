@@ -8,12 +8,9 @@ type Props = {
 };
 
 const useCreateCategory = (props?: Props) => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: createCategory,
         onSuccess: (data) => {
-            queryClient.invalidateQueries(CATEGORIES_QUERY_KEY);
             if (props?.onSuccess) {
                 props?.onSuccess(data);
             }
@@ -27,11 +24,11 @@ const useCreateCategory = (props?: Props) => {
     });
 };
 
-const useUpdateCategory = (props?: Props) => {
+const useUpdateCategory = (id: number, props?: Props) => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: updateCategory,
+        mutationFn: updateCategory(id),
         onSuccess: (data) => {
             queryClient.invalidateQueries(CATEGORIES_QUERY_KEY);
             if (props?.onSuccess) {
@@ -67,4 +64,4 @@ const useDeleteCategory = (props?: Props) => {
     });
 };
 
-export default { useCreateCategory, useUpdateCategory, useDeleteCategory };
+export { useCreateCategory, useUpdateCategory, useDeleteCategory };

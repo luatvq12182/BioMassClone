@@ -1,18 +1,34 @@
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { CategoryProvider, ICategory } from "@/modules/category";
+import {
+    CategoryProvider,
+    ICategory,
+    useDeleteCategory,
+} from "@/modules/category";
 import { Button } from "primereact/button";
+import { showConfirm } from "@/utils";
 
-type Props = {};
+type Props = {
+    langCode?: string;
+};
 
-const Table = ({}: Props) => {
+const Table = ({ langCode }: Props) => {
+    const { mutate: deleteCategory, isLoading: isDeleting } =
+        useDeleteCategory();
+
+    const handleClickDelete = (id: number) => {
+        showConfirm(() => deleteCategory(id));
+    };
+
     return (
         <CategoryProvider
-            render={(categories: ICategory[]) => {
+            langCode={langCode}
+            render={(categories: ICategory[], isLoading) => {
                 return (
                     <DataTable
                         value={categories}
-                        size="small"
+                        loading={isLoading}
+                        size='small'
                         showGridlines
                         tableStyle={{ minWidth: "50rem" }}
                     >
@@ -39,18 +55,22 @@ const Table = ({}: Props) => {
                                     style={{ fontSize: "1.5rem" }}
                                 ></i>
                             }
-                            // headerStyle={{ textAlign: "center" }}
-                            // style={{ textAlign: "center" }}
-                            body={() => {
+                            style={{ width: "150px", textAlign: "center" }}
+                            body={(e) => {
                                 return (
                                     <div>
                                         <Button
+                                            disabled={isDeleting}
                                             icon='pi pi-pencil'
                                             rounded
                                             text
                                             aria-label='Filter'
                                         />
                                         <Button
+                                            disabled={isDeleting}
+                                            onClick={() =>
+                                                handleClickDelete(e.id)
+                                            }
                                             icon='pi pi-trash'
                                             rounded
                                             text

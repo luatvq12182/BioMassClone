@@ -1,7 +1,6 @@
 export interface ICategory {
     id?: number;
-    catLangId?: number;
-    languageId?: number;
-    name: string;
-    slug: string;
+    languageId: number | null;
+    name?: string;
+    slug?: string;
 }
