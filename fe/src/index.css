@@ -45,3 +45,50 @@ select {
 .layout-content .layout-content-inner {
     padding: 2rem 4rem;
 }
+
+.flex {
+    display: flex;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.ml-auto {
+    margin-left: auto !important;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.menu-child-category {
+    display: flex;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--surface-900);
+    border-bottom: 1px solid var(--surface-border);
+    margin-bottom: 0.25rem;
+}
+
+ol a {
+    display: flex;
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    color: var(--surface-900);
+    border-radius: var(--border-radius);
+    transition: box-shadow 0.2s;
+}
+
+ol a:hover {
+    background-color: var(--surface-hover);
+}
+
+li > ol {
+    margin-bottom: 1.5rem;
+}

@@ -5,17 +5,23 @@ import { ProgressBar } from "primereact/progressbar";
 import { Button } from "primereact/button";
 import { Tooltip } from "primereact/tooltip";
 import { Tag } from "primereact/tag";
+import { TabView, TabPanel } from "primereact/tabview";
+import { Card } from "primereact/card";
 
 import { IMedia, MediaProvider, useUploadFile } from "@/modules/media";
 
 const Media = () => {
-    const { mutate: uploadMedia } = useUploadFile();
+    const { mutate: uploadMedia } = useUploadFile({
+        onSuccess: () => {
+            (fileUploadRef.current as any).clear();
+        },
+    });
 
     const toast = useRef(null);
     const [totalSize, setTotalSize] = useState(0);
     const fileUploadRef = useRef(null);
 
-    const onTemplateSelect = (e) => {
+    const onTemplateSelect = (e: any) => {
         let _totalSize = totalSize;
         let files = e.files;
 
@@ -26,22 +32,22 @@ const Media = () => {
         setTotalSize(_totalSize);
     };
 
-    const onTemplateUpload = (e) => {
+    const onTemplateUpload = (e: any) => {
         let _totalSize = 0;
 
-        e.files.forEach((file) => {
+        e.files.forEach((file: any) => {
             _totalSize += file.size || 0;
         });
 
         setTotalSize(_totalSize);
-        toast.current.show({
-            severity: "info",
-            summary: "Success",
-            detail: "File Uploaded",
-        });
+        // toast.current.show({
+        //     severity: "info",
+        //     summary: "Success",
+        //     detail: "File Uploaded",
+        // });
     };
 
-    const onTemplateRemove = (file, callback) => {
+    const onTemplateRemove = (file: any, callback: any) => {
         setTotalSize(totalSize - file.size);
         callback();
     };
@@ -50,12 +56,12 @@ const Media = () => {
         setTotalSize(0);
     };
 
-    const headerTemplate = (options) => {
+    const headerTemplate = (options: any) => {
         const { className, chooseButton, uploadButton, cancelButton } = options;
         const value = totalSize / 100000;
         const formatedValue =
             fileUploadRef && fileUploadRef.current
-                ? fileUploadRef.current.formatSize(totalSize)
+                ? (fileUploadRef.current as any).formatSize(totalSize)
                 : "0 B";
 
         return (
@@ -82,7 +88,7 @@ const Media = () => {
         );
     };
 
-    const itemTemplate = (file, props) => {
+    const itemTemplate = (file: any, props: any) => {
         return (
             <div className='flex align-items-center flex-wrap'>
                 <div
@@ -174,72 +180,75 @@ const Media = () => {
     };
 
     return (
-        <div>
-            <Toast ref={toast}></Toast>
+        <Card title="Media">
+            <TabView>
+                <TabPanel header="Upload media">
+                    <Toast ref={toast}></Toast>
 
-            <Tooltip
-                target='.custom-choose-btn'
-                content='Choose'
-                position='bottom'
-            />
-            <Tooltip
-                target='.custom-upload-btn'
-                content='Upload'
-                position='bottom'
-            />
-            <Tooltip
-                target='.custom-cancel-btn'
-                content='Clear'
-                position='bottom'
-            />
+                    <Tooltip
+                        target='.custom-choose-btn'
+                        content='Choose'
+                        position='bottom'
+                    />
+                    <Tooltip
+                        target='.custom-upload-btn'
+                        content='Upload'
+                        position='bottom'
+                    />
+                    <Tooltip
+                        target='.custom-cancel-btn'
+                        content='Clear'
+                        position='bottom'
+                    />
 
-            <FileUpload
-                customUpload
-                uploadHandler={customBase64Uploader}
-                ref={fileUploadRef}
-                name='file[]'
-                url='http://localhost:5240/api/media/upload'
-                multiple
-                accept='image/*'
-                maxFileSize={10000000}
-                onUpload={onTemplateUpload}
-                onSelect={onTemplateSelect}
-                onError={onTemplateClear}
-                onClear={onTemplateClear}
-                headerTemplate={headerTemplate}
-                itemTemplate={itemTemplate}
-                emptyTemplate={emptyTemplate}
-                chooseOptions={chooseOptions}
-                uploadOptions={uploadOptions}
-                cancelOptions={cancelOptions}
-            />
+                    <FileUpload
+                        customUpload
+                        uploadHandler={customBase64Uploader}
+                        ref={fileUploadRef}
+                        multiple
+                        accept='image/*'
+                        maxFileSize={10000000}
+                        onUpload={onTemplateUpload}
+                        onSelect={onTemplateSelect}
+                        onError={onTemplateClear}
+                        onClear={onTemplateClear}
+                        headerTemplate={headerTemplate}
+                        itemTemplate={itemTemplate}
+                        emptyTemplate={emptyTemplate}
+                        chooseOptions={chooseOptions}
+                        uploadOptions={uploadOptions}
+                        cancelOptions={cancelOptions}
+                    />
+                </TabPanel>
 
-            <MediaProvider
-                render={(media: IMedia[]) => {
-                    console.log("Media", media);
-
-                    return (
-                        <div className='grid grid-cols-4 gap-4 mt-4'>
-                            {media?.map((item) => {
-                                return (
-                                    <div
-                                        className='h-[250px] w-full'
-                                        key={item.id}
-                                        style={{
-                                            backgroundImage: `url(${
-                                                import.meta.env.VITE_SERVICE
-                                            }/${item.imageUrl})`,
-                                            backgroundSize: "cover",
-                                            borderRadius: "5px",
-                                        }}
-                                    ></div>
-                                );
-                            })}
-                        </div>
-                    );
-                }}
-            />
-        </div>
+                <TabPanel header="Media list">
+                    <MediaProvider
+                        render={(media: IMedia[]) => {
+                            return (
+                                <div className='grid grid-cols-4 gap-4 mt-4'>
+                                    {media?.map((item) => {
+                                        return (
+                                            <div
+                                                className='h-[250px] w-full'
+                                                key={item.id}
+                                                style={{
+                                                    backgroundImage: `url(${
+                                                        import.meta.env
+                                                            .VITE_SERVICE
+                                                    }/${item.imageUrl})`,
+                                                    backgroundSize: "cover",
+                                                    borderRadius: "5px",
+                                                }}
+                                            ></div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        }}
+                    />
+                </TabPanel>
+            </TabView>
+        </Card>
     );
 };
 
