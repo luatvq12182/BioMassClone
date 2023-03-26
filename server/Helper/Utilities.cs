@@ -15,7 +15,7 @@ namespace server.Helper
 
                 string pathFile = Path.Combine(filePath,fileName);
 
-                var supportedTypes = new[] { "jpg", "jpeg", "png", "gif" };
+                var supportedTypes = new[] { "jpg", "jpeg", "png", "gif","webp" };
                 var fileExt = Path.GetExtension(file.FileName).Substring(1);
 
                 if (!supportedTypes.Contains(fileExt.ToLower())) /// Khác các file định nghĩa
