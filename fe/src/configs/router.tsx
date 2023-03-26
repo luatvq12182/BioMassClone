@@ -4,6 +4,7 @@ import AdminLayout from "@/layouts/admin";
 
 import Category from "@/pages/admin/category";
 import Login from "@/pages/admin/login";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const router = createBrowserRouter([
     {
@@ -12,7 +13,11 @@ const router = createBrowserRouter([
     },
     {
         path: "admin",
-        element: <AdminLayout />,
+        element: (
+            <ProtectedRoute>
+                <AdminLayout />
+            </ProtectedRoute>
+        ),
         children: [
             {
                 path: "category",
@@ -22,8 +27,8 @@ const router = createBrowserRouter([
     },
     {
         path: "/login",
-        element: <Login />
-    }
+        element: <Login />,
+    },
 ]);
 
 export default router;
