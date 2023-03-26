@@ -32,7 +32,7 @@ const Table = ({ langCode, onOpenUpdateDialog }: Props) => {
                         size='small'
                         showGridlines
                         tableStyle={{ minWidth: "50rem" }}
-                    >
+                    > 
                         <Column
                             field='index'
                             header='#'
