@@ -118,7 +118,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<CatLang> UpdateTransactionalAsync(CatLang entity)
         {
-            var sql = "UPDATE CatLangs SET LanguageId = @LanguageId , CategoryId = @CategoryId , Slug = @Slug , Name = @Name WHERE Id = @Id ";
+            var sql = "UPDATE CatLangs SET Slug = @Slug , Name = @Name WHERE Id = @Id ";
             var result = await _session.Connection.ExecuteAsync(sql, entity, _session.Transaction);
             return result > 0 ? entity : null;
         }
