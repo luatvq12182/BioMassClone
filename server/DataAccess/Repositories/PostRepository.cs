@@ -105,7 +105,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<Post> AddTransactionalAsync(Post entity)
         {
-            var sql = "INSERT INTO Posts (CategoryId,Title, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Posts (CategoryId,Title,Thumbnail, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title,@Thumbnail, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
 
             var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
             entity.Id = result;

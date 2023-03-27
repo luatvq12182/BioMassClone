@@ -94,7 +94,7 @@ namespace server.Services
                     foreach (var item in spescificItems)
                     {
                         var postLang = item.MapToPostLangEntity();
-                        postLang.PostId = standardItem.Id;
+                        postLang.PostId = insertedPost.Id;
                         await _unit.PostLang.AddTransactionalAsync(postLang);
                     }
                 }

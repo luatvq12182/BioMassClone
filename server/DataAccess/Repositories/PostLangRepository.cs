@@ -25,7 +25,7 @@ namespace server.DataAccess.Repositories
         }
         public async Task<PostLang> AddAsync(PostLang entity)
         {
-            var sql = "INSERT INTO PostLangs (PostId, LangId , Title, Body ,ShortDescription) VALUES (@PostId,@LangId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO PostLangs (PostId, LanguageId , Title, Body ,ShortDescription) VALUES (@PostId,@LanguageId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
@@ -37,19 +37,20 @@ namespace server.DataAccess.Repositories
 
         public async Task<PostLang> AddTransactional(PostLang entity)
         {
-            var sql = "INSERT INTO PostLangs (PostId, LangId , Title, Body ,ShortDescription) VALUES (@PostId,@LangId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
-            {
-                connection.Open();
-                var result = await connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
+            var sql = "INSERT INTO PostLangs (PostId, LanguageId , Title, Body ,ShortDescription) VALUES (@PostId,@LanguageId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
+
+                var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
                 entity.Id = result;
                 return entity;
-            }
+            
         }
 
-        public Task<PostLang> AddTransactionalAsync(PostLang entity)
+        public async Task<PostLang> AddTransactionalAsync(PostLang entity)
         {
-            throw new NotImplementedException();
+            var sql = "INSERT INTO PostLangs (PostId, LanguageId , Title, Body ,ShortDescription) VALUES (@PostId,@LanguageId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
+            var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
+            entity.Id = result;
+            return entity;
         }
 
         public async Task<int> DeleteAsync(int id)
@@ -76,11 +77,11 @@ namespace server.DataAccess.Repositories
 
         public async Task<IReadOnlyList<PostLang>> GetAllBySpecificLang(int languageId)
         {
-            var query = "SELECT * FROM PostLangs WHERE LangId = @LangId";
+            var query = "SELECT * FROM PostLangs WHERE LanguageId = @LanguageId";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.QueryAsync<PostLang>(query, new { LangId = languageId });
+                var result = await connection.QueryAsync<PostLang>(query, new { LanguageId = languageId });
                 return result.ToList();
             }
         }

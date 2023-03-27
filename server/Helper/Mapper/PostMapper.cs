@@ -10,7 +10,7 @@ namespace server.Helper.Mapper
             return new Post
             {
                 Id = model.Id,
-                CategoryId= model.CategoryId.Value,
+                CategoryId= model.CategoryId.Value,              
                 Title = model.Title,
                 Body= model.Body,
                 Thumbnail = model.Thumbnail,

@@ -80,7 +80,7 @@ namespace server.Helper
                 Id = postLang.Id,
                 PostId = post.Id,
                 CategoryId = post.CategoryId,
-                LanguageId = postLang.LangId,
+                LanguageId = postLang.LanguageId,
                 Thumbnail = post.Thumbnail,
                 Title = postLang.Title,
                 Body = postLang.Body,

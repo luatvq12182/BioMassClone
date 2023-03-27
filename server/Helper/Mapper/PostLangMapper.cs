@@ -12,7 +12,7 @@ namespace server.Helper.Mapper
                 Title= model.Title,
                 ShortDescription= model.ShortDescription,
                 Body= model.Body,
-                LangId = model.LanguageId.Value,
+                LanguageId = model.LanguageId.Value,
                 PostId = model.PostId
             };
         }
