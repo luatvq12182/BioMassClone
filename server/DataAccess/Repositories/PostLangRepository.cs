@@ -76,7 +76,13 @@ namespace server.DataAccess.Repositories
 
         public Task<IReadOnlyList<PostLang>> GetAllBySpecificLang(int languageId)
         {
-            throw new NotImplementedException();
+            var query = "SELECT * FROM PostLangs WHERE LangId = @LangId";
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                var result = await connection.QueryAsync<PostLang>(query, new { LangId = languageId });
+                return result.ToList();
+            }
         }
 
         public async Task<PostLang> GetByIdAsync(int id)

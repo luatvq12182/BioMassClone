@@ -11,14 +11,14 @@ namespace server.Services
     {
         public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
         public Task<IReadOnlyList<PostModel>> InsertTransactional(IReadOnlyList<PostModel> model);
-        public Task<IReadOnlyList<PostModel>> UpDateTransactional (IReadOnlyList<PostModel> model);
+        public Task<IReadOnlyList<PostModel>> UpDateTransactional(IReadOnlyList<PostModel> model);
     }
     public class PostService : IPostService
     {
         private readonly IUnitOfWork _unit;
         public PostService(IUnitOfWork unitOfWork)
         {
-            _unit= unitOfWork;
+            _unit = unitOfWork;
         }
 
         public Task<Post> AddAsync(Post entity)
@@ -47,24 +47,24 @@ namespace server.Services
         }
         public async Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model)
         {
-            if(!string.IsNullOrEmpty(model.Lang))
+            if (!string.IsNullOrEmpty(model.Lang))
             {
                 var language = await _unit.Language.GetByCode(model.Lang);
-                if(language != null)
+                if (language != null)
                 {
                     List<PostModel> Items = new List<PostModel>();
                     int TotalCount;
                     var postLangs = await _unit.PostLang.GetAllBySpecificLang(language.Id);
                     var posts = await _unit.Post.GetAllAsync();
-                    if(posts!= null && posts.Any())
+                    if (posts != null && posts.Any())
                     {
-                        foreach(var post in posts)
+                        foreach (var post in posts)
                         {
-                            if(postLangs != null && postLangs.Any())
+                            if (postLangs != null && postLangs.Any())
                             {
-                                foreach(var postLang in postLangs)
+                                foreach (var postLang in postLangs)
                                 {
-                                    if(postLang.PostId == post.Id)
+                                    if (postLang.PostId == post.Id)
                                     {
                                         var postModel = Utilities.MapToPostModel(post, postLang);
                                         Items.Add(postModel);
@@ -74,8 +74,9 @@ namespace server.Services
                         }
                     }
                     TotalCount = Items.Count;
-                    return new PaginatedList<PostModel>(Items,TotalCount,model.PageNumber,model.Pagesize);
+                    return new PaginatedList<PostModel>(Items, TotalCount, model.PageNumber, model.Pagesize);
                 }
+                else { return null; }
 
             }
             return await _unit.Post.GetPagedPost(model);

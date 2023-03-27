@@ -26,6 +26,10 @@ namespace server.Controllers
         public async Task<ActionResult<PostModel>> GetAll([FromQuery] PostSearchModel model)
         {
             var data = await _postService.GetPagedPost(model);
+            if (data == null)
+            {
+                return BadRequest("Wrong lang code ");
+            }
             return Ok(data);
         }
 
