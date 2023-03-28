@@ -95,17 +95,27 @@ const Sidebar = ({ isOpen, onHide }: Props) => {
                         </ol>
                     </li> */}
 
-                    {/* <li>
-                        <span className='menu-child-category'>Article</span>
+                    <li>
+                        <span className='menu-child-category'>Post</span>
                         <ol>
                             <li>
-                                <Link to='/admin/article'>Article list</Link>
+                                <Link
+                                    onClick={onHide}
+                                    to='/admin/post'
+                                >
+                                    Post list
+                                </Link>
                             </li>
                             <li>
-                                <Link to='/admin/article/new'>New article</Link>
+                                <Link
+                                    onClick={onHide}
+                                    to='/admin/post/new'
+                                >
+                                    New post
+                                </Link>
                             </li>
                         </ol>
-                    </li> */}
+                    </li>
                 </ol>
             </PSidebar>
         </div>

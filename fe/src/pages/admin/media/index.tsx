@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
+import classNames from "classnames";
 import { Toast } from "primereact/toast";
 import { FileUpload } from "primereact/fileupload";
 import { ProgressBar } from "primereact/progressbar";
@@ -10,7 +11,15 @@ import { Card } from "primereact/card";
 
 import { IMedia, MediaProvider, useUploadFile } from "@/modules/media";
 
-const Media = () => {
+type Props = {
+    isDialog?: boolean;
+    value: IMedia | null;
+    onChange?: (media: IMedia) => void;
+};
+
+const Media = ({ isDialog = false, value, onChange }: Props) => {
+    const [selectedImg, setSelectedImg] = useState<IMedia | null>(value);
+
     const { mutate: uploadMedia } = useUploadFile({
         onSuccess: () => {
             (fileUploadRef.current as any).clear();
@@ -151,12 +160,14 @@ const Media = () => {
         iconOnly: true,
         className: "custom-choose-btn p-button-rounded p-button-outlined",
     };
+
     const uploadOptions = {
         icon: "pi pi-fw pi-cloud-upload",
         iconOnly: true,
         className:
             "custom-upload-btn p-button-success p-button-rounded p-button-outlined",
     };
+
     const cancelOptions = {
         icon: "pi pi-fw pi-times",
         iconOnly: true,
@@ -179,76 +190,100 @@ const Media = () => {
         uploadMedia(formData);
     };
 
-    return (
-        <Card title="Media">
-            <TabView>
-                <TabPanel header="Upload media">
-                    <Toast ref={toast}></Toast>
+    return React.createElement(
+        isDialog ? React.Fragment : Card,
+        isDialog ? {
+            title: "Media",
+        } : {},
+        <TabView>
+            <TabPanel header='Media list'>
+                <MediaProvider
+                    render={(media: IMedia[]) => {
+                        return (
+                            <div className='grid grid-cols-4 gap-4 mt-4'>
+                                {media?.map((item) => {
+                                    return (
+                                        <div
+                                            onClick={() => {
+                                                if (isDialog) {
+                                                    setSelectedImg(item);
+                                                    onChange?.(item);
+                                                }
+                                            }}
+                                            className={classNames(
+                                                "h-[250px] w-full ease-out duration-300",
+                                                {
+                                                    "hover:opacity-80":
+                                                        isDialog,
+                                                },
+                                                {
+                                                    "hover:scale-95": isDialog,
+                                                },
+                                                {
+                                                    "scale-95 border-2 border-sky-400 border-solid":
+                                                        selectedImg?.id ===
+                                                        item.id,
+                                                }
+                                            )}
+                                            key={item.id}
+                                            style={{
+                                                backgroundImage: `url(${
+                                                    import.meta.env.VITE_SERVICE
+                                                }/${item.imageUrl})`,
+                                                backgroundSize: "cover",
+                                                borderRadius: "5px",
+                                                cursor: isDialog
+                                                    ? "pointer"
+                                                    : "unset",
+                                            }}
+                                        ></div>
+                                    );
+                                })}
+                            </div>
+                        );
+                    }}
+                />
+            </TabPanel>
 
-                    <Tooltip
-                        target='.custom-choose-btn'
-                        content='Choose'
-                        position='bottom'
-                    />
-                    <Tooltip
-                        target='.custom-upload-btn'
-                        content='Upload'
-                        position='bottom'
-                    />
-                    <Tooltip
-                        target='.custom-cancel-btn'
-                        content='Clear'
-                        position='bottom'
-                    />
+            <TabPanel header='Upload media'>
+                <Toast ref={toast}></Toast>
 
-                    <FileUpload
-                        customUpload
-                        uploadHandler={customBase64Uploader}
-                        ref={fileUploadRef}
-                        multiple
-                        accept='image/*'
-                        maxFileSize={10000000}
-                        onUpload={onTemplateUpload}
-                        onSelect={onTemplateSelect}
-                        onError={onTemplateClear}
-                        onClear={onTemplateClear}
-                        headerTemplate={headerTemplate}
-                        itemTemplate={itemTemplate}
-                        emptyTemplate={emptyTemplate}
-                        chooseOptions={chooseOptions}
-                        uploadOptions={uploadOptions}
-                        cancelOptions={cancelOptions}
-                    />
-                </TabPanel>
+                <Tooltip
+                    target='.custom-choose-btn'
+                    content='Choose'
+                    position='bottom'
+                />
+                <Tooltip
+                    target='.custom-upload-btn'
+                    content='Upload'
+                    position='bottom'
+                />
+                <Tooltip
+                    target='.custom-cancel-btn'
+                    content='Clear'
+                    position='bottom'
+                />
 
-                <TabPanel header="Media list">
-                    <MediaProvider
-                        render={(media: IMedia[]) => {
-                            return (
-                                <div className='grid grid-cols-4 gap-4 mt-4'>
-                                    {media?.map((item) => {
-                                        return (
-                                            <div
-                                                className='h-[250px] w-full'
-                                                key={item.id}
-                                                style={{
-                                                    backgroundImage: `url(${
-                                                        import.meta.env
-                                                            .VITE_SERVICE
-                                                    }/${item.imageUrl})`,
-                                                    backgroundSize: "cover",
-                                                    borderRadius: "5px",
-                                                }}
-                                            ></div>
-                                        );
-                                    })}
-                                </div>
-                            );
-                        }}
-                    />
-                </TabPanel>
-            </TabView>
-        </Card>
+                <FileUpload
+                    customUpload
+                    uploadHandler={customBase64Uploader}
+                    ref={fileUploadRef}
+                    multiple
+                    accept='image/*'
+                    maxFileSize={10000000}
+                    onUpload={onTemplateUpload}
+                    onSelect={onTemplateSelect}
+                    onError={onTemplateClear}
+                    onClear={onTemplateClear}
+                    headerTemplate={headerTemplate}
+                    itemTemplate={itemTemplate}
+                    emptyTemplate={emptyTemplate}
+                    chooseOptions={chooseOptions}
+                    uploadOptions={uploadOptions}
+                    cancelOptions={cancelOptions}
+                />
+            </TabPanel>
+        </TabView>
     );
 };
 
