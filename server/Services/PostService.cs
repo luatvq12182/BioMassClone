@@ -87,6 +87,7 @@ namespace server.Services
             var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
             if (standardItem != null)
             {
+                standardItem.CreatedDate= DateTime.Now;
                 var insertedPost = await _unit.Post.AddTransactionalAsync(standardItem.MapToEntity());
                 var spescificItems = model.Where(x => x.LanguageId > 0).ToList();
                 if (spescificItems != null && spescificItems.Any())
