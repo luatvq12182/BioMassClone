@@ -46,7 +46,7 @@ const Form = ({ onChange, onSubmit, loading, data }: Props) => {
                 <Editor
                     // value={text}
                     onTextChange={(e) => {
-                        onChange("shortDescription")(e.htmlValue);
+                        onChange("body")(e.htmlValue);
                     }}
                     style={{ height: "320px" }}
                 />
