@@ -36,7 +36,7 @@ namespace server.DataAccess.Repositories
         public async Task<bool> AddToSlider(int id)
         {
             var sql = "UPDATE Images SET ShowOnSlider = 1 WHERE Id = @Id";
-            var result =  await _session.Connection.ExecuteAsync(sql, new {Id = id});
+            var result =  await _session.Connection.ExecuteAsync(sql, new {Id = id}, _session.Transaction);
             if(result > 0)
             {
                 return true;
