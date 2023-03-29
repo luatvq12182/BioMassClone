@@ -29,7 +29,9 @@ namespace server.Services
             {
                 isSuccessful &= await _unit.Image.AddToSlider(imageId);
             }
-            return isSuccessful;
+            if(isSuccessful && await _unit.CommitThings())
+                return isSuccessful;
+            return false;
 
         }
 
