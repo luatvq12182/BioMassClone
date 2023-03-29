@@ -99,11 +99,11 @@ namespace server.DataAccess.Repositories
 
         public async Task<PostLang> GetBySpecificLang(int postId, int languageId)
         {
-            var query = "SELECT * FROM PostLang WHERE PostId = @PostId and LanguageId = @LanguageId ";
+            var query = "SELECT * FROM PostLangs WHERE PostId = @PostId and LanguageId = @LanguageId ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.QueryFirstOrDefaultAsync<PostLang>(query);
+                var result = await connection.QueryFirstOrDefaultAsync<PostLang>(query, new { PostId = postId, LanguageId = languageId});
                 return result;
             }
         }
