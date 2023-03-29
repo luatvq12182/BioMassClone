@@ -114,7 +114,7 @@ namespace server.DataAccess.Repositories
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.QueryAsync<PostLang>(query);
+                var result = await connection.QueryAsync<PostLang>(query, new {PostId = postId});
                 return result.ToList();
             }
         }
