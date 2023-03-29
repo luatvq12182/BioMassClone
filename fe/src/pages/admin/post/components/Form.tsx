@@ -1,8 +1,9 @@
-import { IPost } from "@/modules/post";
 import { Button } from "primereact/button";
 import { Editor } from "primereact/editor";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+
+import { IPost } from "@/modules/post";
 
 type Props = {
     onChange: (field: keyof IPost) => (e: any) => void;
@@ -23,6 +24,7 @@ const Form = ({ onChange, onSubmit, loading, data }: Props) => {
                     onChange={(e) => {
                         onChange("title")(e.target.value);
                     }}
+                    value={data?.["title"] || ''}
                 />
             </div>
 
@@ -37,6 +39,7 @@ const Form = ({ onChange, onSubmit, loading, data }: Props) => {
                         onChange("shortDescription")(e.target.value);
                     }}
                     rows={3}
+                    value={data?.["shortDescription"] || ''}
                 />
             </div>
 
@@ -44,7 +47,7 @@ const Form = ({ onChange, onSubmit, loading, data }: Props) => {
                 <label htmlFor='body'>Post content</label>
 
                 <Editor
-                    // value={text}
+                    value={data?.['body'] || ''}
                     onTextChange={(e) => {
                         onChange("body")(e.htmlValue);
                     }}

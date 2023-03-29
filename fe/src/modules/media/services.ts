@@ -13,4 +13,8 @@ const uploadFile = (formData: FormData) => {
     });
 };
 
-export { getMedia, uploadFile };
+const addToSlider = (ids: number[]) => {
+    return httpClient.post("/media/add-to-slider", ids);
+}
+
+export { getMedia, uploadFile, addToSlider };

@@ -56,16 +56,13 @@ const PostList = () => {
                 return (
                     <div>
                         <Button
-                            // disabled={isDeleting}
                             icon='pi pi-pencil'
                             rounded
                             text
                             aria-label='Filter'
-                            // onClick={() => {
-                            //     onOpenUpdateDialog(
-                            //         e.categoryId || e.id
-                            //     );
-                            // }}
+                            onClick={() => {
+                                navigate(`/admin/post/edit/${e.id}`);
+                            }}
                         />
                         <Button
                             // disabled={isDeleting}
@@ -101,7 +98,7 @@ const PostList = () => {
                     return (
                         <Column
                             key={col.field}
-                            {...col as any}
+                            {...(col as any)}
                         />
                     );
                 })}

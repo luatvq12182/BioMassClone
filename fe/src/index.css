@@ -79,10 +79,23 @@ select {
 
 ol a {
     display: flex;
-    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    align-items: center;
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    margin: 6px 0;
     color: var(--surface-900);
     border-radius: var(--border-radius);
     transition: box-shadow 0.2s;
+}
+
+ol a .icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--border-radius);
+    margin-right: 0.5rem;
+    border: 1px solid var(--surface-border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 ol a:hover {
@@ -91,4 +104,9 @@ ol a:hover {
 
 li > ol {
     margin-bottom: 1.5rem;
+}
+
+ol a.active {
+    background-color: var(--highlight-bg);
+    color: var(--highlight-text-color);
 }

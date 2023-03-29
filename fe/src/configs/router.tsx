@@ -1,13 +1,17 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import AdminLayout from "@/layouts/admin";
-
-import Category from "@/pages/admin/category";
-import Login from "@/pages/admin/login";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Media from "@/pages/admin/media";
-import PostList from "@/pages/admin/post";
-import NewPost from "@/pages/admin/post/NewPost";
+
+import {
+    Category,
+    EditPost,
+    Login,
+    Media,
+    NewPost,
+    PostList,
+    Slider,
+} from "@/pages/admin";
 
 const router = createBrowserRouter([
     {
@@ -31,22 +35,30 @@ const router = createBrowserRouter([
                 element: <Media />,
             },
             {
-                path: "post",
-                element: <PostList />
+                path: "slider",
+                element: <Slider />,
             },
             {
-                path: 'post/new',
-                element: <NewPost />
+                path: "post",
+                element: <PostList />,
+            },
+            {
+                path: "post/new",
+                element: <NewPost />,
+            },
+            {
+                path: "post/edit/:id",
+                element: <EditPost />,
             },
             {
                 path: "*",
-                element: <h1>404</h1>
+                element: <h1>404</h1>,
             },
         ],
     },
     {
         path: "*",
-        element: <h1>404</h1>
+        element: <h1>404</h1>,
     },
     {
         path: "/login",

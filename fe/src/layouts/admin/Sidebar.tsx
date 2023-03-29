@@ -1,6 +1,7 @@
-// import { SlideMenu } from "primereact/slidemenu";
+import { NavLink } from "react-router-dom";
 import { Sidebar as PSidebar } from "primereact/sidebar";
-import { Link } from "react-router-dom";
+
+import { ADMIN_NAVIGATION } from "@/configs/admin-navigation";
 
 type Props = {
     isOpen: boolean;
@@ -8,114 +9,40 @@ type Props = {
 };
 
 const Sidebar = ({ isOpen, onHide }: Props) => {
-    const items = [
-        {
-            label: "Category",
-            icon: "pi pi-fw pi-file",
-        },
-        {
-            label: "Media",
-            icon: "pi pi-fw pi-file",
-        },
-        {
-            label: "Article",
-            icon: "pi pi-fw pi-file",
-            items: [
-                {
-                    label: "New article",
-                    icon: "pi pi-fw pi-plus",
-                },
-                {
-                    label: "Article list",
-                    icon: "pi pi-fw pi-trash",
-                },
-            ],
-        },
-    ];
-
     return (
         <div className='card flex justify-content-center'>
             <PSidebar
                 visible={isOpen}
                 onHide={onHide}
             >
-                {/* <SlideMenu
-                    model={items}
-                    viewportHeight={220}
-                /> */}
                 <ol
                     style={{
-                        margin: "0 0 0 0rem",
-                        padding: "0.25rem 0 0 0.5rem",
+                        margin: "0",
+                        padding: "0.25rem 0 0 0.25rem",
                         // borderLeft: "1px solid var(--surface-border)",
                     }}
                 >
-                    <li>
-                        <Link
-                            onClick={onHide}
-                            to='/admin/category'
-                        >
-                            Category
-                        </Link>
-                    </li>
-                    <li>
-                        <Link
-                            onClick={onHide}
-                            to='/admin/media'
-                        >
-                            Media
-                        </Link>
-                    </li>
+                    {ADMIN_NAVIGATION.map(({ icon, label, to }) => {
+                        return (
+                            <li key={to}>
+                                <NavLink
+                                    onClick={onHide}
+                                    to={to}
+                                >
+                                    <div className='icon'>
+                                        <i
+                                            className={icon}
+                                            style={{
+                                                fontSize: "1rem",
+                                            }}
+                                        ></i>
+                                    </div>
 
-                    {/* <li>
-                        <span className='menu-child-category'>Category</span>
-                        <ol>
-                            <li>
-                                <Link
-                                    onClick={onHide}
-                                    to='/admin/category'
-                                >
-                                    Category list
-                                </Link>
+                                    {label}
+                                </NavLink>
                             </li>
-                        </ol>
-                    </li>
-
-                    <li>
-                        <span className='menu-child-category'>Media</span>
-                        <ol>
-                            <li>
-                                <Link
-                                    onClick={onHide}
-                                    to='/admin/media'
-                                >
-                                    Upload
-                                </Link>
-                            </li>
-                        </ol>
-                    </li> */}
-
-                    <li>
-                        <span className='menu-child-category'>Post</span>
-                        <ol>
-                            <li>
-                                <Link
-                                    onClick={onHide}
-                                    to='/admin/post'
-                                >
-                                    Post list
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    onClick={onHide}
-                                    to='/admin/post/new'
-                                >
-                                    New post
-                                </Link>
-                            </li>
-                        </ol>
-                    </li>
+                        );
+                    })}
                 </ol>
             </PSidebar>
         </div>

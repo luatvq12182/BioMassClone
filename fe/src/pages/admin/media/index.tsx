@@ -13,11 +13,11 @@ import { IMedia, MediaProvider, useUploadFile } from "@/modules/media";
 
 type Props = {
     isDialog?: boolean;
-    value: IMedia | null;
+    value?: IMedia | null;
     onChange?: (media: IMedia) => void;
 };
 
-const Media = ({ isDialog = false, value, onChange }: Props) => {
+const Media = ({ isDialog = false, value = null, onChange }: Props) => {
     const [selectedImg, setSelectedImg] = useState<IMedia | null>(value);
 
     const { mutate: uploadMedia } = useUploadFile({
