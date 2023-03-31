@@ -31,8 +31,8 @@ const NewPost = () => {
 
     const handleChange =
         (langId: number | null) => (field: keyof IPost) => (e: any) => {
-            setPayload((preState: IPost[]) => {
-                if (!preState.find((p) => p.languageId === langId)) {
+            setPayload((preState: any) => {
+                if (!preState.find((p: any) => p.languageId === langId)) {
                     return [
                         ...preState,
                         {
@@ -42,7 +42,7 @@ const NewPost = () => {
                     ];
                 }
 
-                return preState.map((p) => {
+                return preState.map((p: any) => {
                     if (p.languageId === langId) {
                         return {
                             ...p,
@@ -89,6 +89,17 @@ const NewPost = () => {
                 onChange={handleChangeMedia}
                 onHide={toggleMediaDialog}
             />
+
+            <div className='col-span-4'>
+                <Button
+                    link
+                    icon='pi pi-backward'
+                    label='Post list'
+                    onClick={() => {
+                        navigate("/admin/post");
+                    }}
+                />
+            </div>
 
             <div className='col-span-3'>
                 <Card title='New Post'>

@@ -8,6 +8,7 @@ import { Tooltip } from "primereact/tooltip";
 import { Tag } from "primereact/tag";
 import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from "primereact/card";
+import { Image } from "primereact/image";
 
 import { IMedia, MediaProvider, useUploadFile } from "@/modules/media";
 
@@ -23,6 +24,12 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
     const { mutate: uploadMedia } = useUploadFile({
         onSuccess: () => {
             (fileUploadRef.current as any).clear();
+
+            (toast.current as any).show({
+                severity: "info",
+                summary: "Success",
+                detail: "File Uploaded",
+            });
         },
     });
 
@@ -49,7 +56,7 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
         });
 
         setTotalSize(_totalSize);
-        // toast.current.show({
+        // (toast.current as any).show({
         //     severity: "info",
         //     summary: "Success",
         //     detail: "File Uploaded",
@@ -190,35 +197,48 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
         uploadMedia(formData);
     };
 
+    const getUrlImage = (src: string) => {
+        return import.meta.env.VITE_SERVICE + src;
+    };
+
     return React.createElement(
-        isDialog ? React.Fragment : Card,
-        isDialog ? {
-            title: "Media",
-        } : {},
+        isDialog ? "div" : Card,
+        {  title: "Media" },
         <TabView>
             <TabPanel header='Media list'>
                 <MediaProvider
                     render={(media: IMedia[]) => {
+                        if (!isDialog) {
+                            return (
+                                <div className='grid grid-cols-4 gap-4 mt-4'>
+                                    {media?.map((item) => {
+                                        return (
+                                            <div>
+                                                <Image
+                                                    src={getUrlImage(item.imageUrl)}
+                                                    className='rounded-lg'
+                                                    alt='Image'
+                                                    // width='250'
+                                                    preview
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        }
+
                         return (
                             <div className='grid grid-cols-4 gap-4 mt-4'>
                                 {media?.map((item) => {
                                     return (
                                         <div
                                             onClick={() => {
-                                                if (isDialog) {
-                                                    setSelectedImg(item);
-                                                    onChange?.(item);
-                                                }
+                                                setSelectedImg(item);
+                                                onChange?.(item);
                                             }}
                                             className={classNames(
-                                                "h-[250px] w-full ease-out duration-300",
-                                                {
-                                                    "hover:opacity-80":
-                                                        isDialog,
-                                                },
-                                                {
-                                                    "hover:scale-95": isDialog,
-                                                },
+                                                "h-[250px] w-full ease-out duration-300 hover:opacity-80 hover:scale-95",
                                                 {
                                                     "scale-95 border-2 border-sky-400 border-solid":
                                                         selectedImg?.id ===
@@ -227,14 +247,10 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
                                             )}
                                             key={item.id}
                                             style={{
-                                                backgroundImage: `url(${
-                                                    import.meta.env.VITE_SERVICE
-                                                }/${item.imageUrl})`,
+                                                backgroundImage: `url(${getUrlImage(item.imageUrl)})`,
                                                 backgroundSize: "cover",
                                                 borderRadius: "5px",
-                                                cursor: isDialog
-                                                    ? "pointer"
-                                                    : "unset",
+                                                cursor: "pointer",
                                             }}
                                         ></div>
                                     );

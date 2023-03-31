@@ -26,3 +26,8 @@ export type GetPostsParams = {
     pageSize?: number;
     pageNumber?: number;
 };
+
+export type GetPostParams = {
+    id: number;
+    lang?: string;
+};

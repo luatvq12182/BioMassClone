@@ -3,12 +3,13 @@ import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Image } from "primereact/image";
 
 import { IMedia, MediaProvider, useAddToSlider } from "@/modules/media";
 import Media from "@/components/Media";
 
 const Slider = () => {
-    const { mutate: addToSlider } = useAddToSlider()
+    const { mutate: addToSlider, isLoading } = useAddToSlider();
     const [selectedMedia, setSelectedMedia] = useState<IMedia | null>(null);
     const [isOpenMedia, setIsOpenMedia] = useState<boolean>(false);
 
@@ -27,10 +28,11 @@ const Slider = () => {
             style: { width: "300px" },
             body: (e: IMedia) => {
                 return (
-                    <img
-                        className='w-[150px]'
+                    <Image
                         src={import.meta.env.VITE_SERVICE + e.imageUrl}
-                        alt=''
+                        alt='Image'
+                        width='450'
+                        preview
                     />
                 );
             },
@@ -93,6 +95,7 @@ const Slider = () => {
                     <h3>Slider</h3>
 
                     <Button
+                        loading={isLoading}
                         icon='pi pi-plus'
                         label='New slider'
                         onClick={() => {

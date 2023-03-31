@@ -3,7 +3,7 @@ import { IMedia } from "./models";
 import useMedia from "./queries";
 
 type Props = {
-    isSlider: boolean;
+    isSlider?: boolean;
     render: (media: IMedia[], isLoading?: boolean) => ReactNode;
 };
 

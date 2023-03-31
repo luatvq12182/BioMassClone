@@ -14,9 +14,7 @@ const httpClient = axios.create({
 httpClient.interceptors.response.use(
     (response) => {
         return new Promise((resolve) => {
-            setTimeout(() => {
-                return resolve(response);
-            }, 1000);
+            resolve(response);
         });
     },
     (error) => {

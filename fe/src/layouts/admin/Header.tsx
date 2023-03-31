@@ -1,7 +1,8 @@
-import { Button } from 'primereact/button';
+import { Avatar } from "primereact/avatar";
+import { Button } from "primereact/button";
 
 type Props = {
-    onOpenSidebar: () => void
+    onOpenSidebar: () => void;
 };
 
 const Header = ({ onOpenSidebar }: Props) => {
@@ -15,11 +16,19 @@ const Header = ({ onOpenSidebar }: Props) => {
                         rounded
                         text
                         aria-label='Filter'
-                        size="large"
+                        size='large'
                     />
-                    
+
                     <h2>Green way</h2>
                 </div>
+
+                <Avatar
+                    icon='pi pi-user'
+                    className='mr-2'
+                    size='normal'
+                    style={{ backgroundColor: "#2196F3", color: "#ffffff" }}
+                    shape='circle'
+                />
             </div>
         </div>
     );
