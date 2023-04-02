@@ -77,8 +77,8 @@ namespace server.Controllers
         }
 
 
-        [HttpPut]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] IReadOnlyList<PostModel> model)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id , [FromBody] IReadOnlyList<PostModel> model)
         {
             var post = await _postService.GetByIdAsync(id);
 
