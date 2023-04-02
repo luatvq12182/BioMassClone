@@ -11,7 +11,14 @@ import { Card } from "primereact/card";
 import { Image } from "primereact/image";
 
 import useMedia from "@/modules/media/queries";
-import { IMedia, MediaProvider, useUploadFile } from "@/modules/media";
+import {
+    IMedia,
+    MediaProvider,
+    useDeleteMedia,
+    useUploadFile,
+} from "@/modules/media";
+import { showConfirm } from "@/utils";
+import Loading from "@/components/Loading";
 
 type Props = {
     isDialog?: boolean;
@@ -22,7 +29,7 @@ type Props = {
 const Media = ({ isDialog = false, value = null, onChange }: Props) => {
     const { refetch } = useMedia();
     const [selectedImg, setSelectedImg] = useState<IMedia | null>(value);
-    const { mutate: uploadMedia } = useUploadFile({
+    const { mutate: uploadMedia, isLoading: isUploading } = useUploadFile({
         onSuccess: () => {
             (fileUploadRef.current as any).clear();
 
@@ -32,6 +39,11 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
                 detail: "File Uploaded",
             });
 
+            refetch();
+        },
+    });
+    const { mutate: deleteFile, isLoading: isDeleting } = useDeleteMedia({
+        onSuccess: () => {
             refetch();
         },
     });
@@ -59,11 +71,6 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
         });
 
         setTotalSize(_totalSize);
-        // (toast.current as any).show({
-        //     severity: "info",
-        //     summary: "Success",
-        //     detail: "File Uploaded",
-        // });
     };
 
     const onTemplateRemove = (file: any, callback: any) => {
@@ -204,60 +211,94 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
         return import.meta.env.VITE_SERVICE + src;
     };
 
+    const isLoading = isUploading || isDeleting;
+
     return React.createElement(
         isDialog ? "div" : Card,
-        {  title: "Media" },
+        { title: "Media" },
         <TabView>
             <TabPanel header='Media list'>
                 <MediaProvider
                     render={(media: IMedia[]) => {
                         if (!isDialog) {
                             return (
-                                <div className='grid grid-cols-4 gap-4 mt-4'>
-                                    {media?.map((item) => {
-                                        return (
-                                            <div key={item.id}>
-                                                <Image
-                                                    src={getUrlImage(item.imageUrl)}
-                                                    className='rounded-lg'
-                                                    alt='Image'
-                                                    // width='250'
-                                                    preview
-                                                />
-                                            </div>
-                                        );
-                                    })}
+                                <div>
+                                    <Loading loading={isLoading} />
+
+                                    <div className='grid grid-cols-4 gap-4 mt-4'>
+                                        {media?.map((item) => {
+                                            return (
+                                                <div
+                                                    key={item.id}
+                                                    className='relative'
+                                                >
+                                                    <div className='absolute -top-2 -right-2 z-[999]'>
+                                                        <Button
+                                                            icon='pi pi-trash'
+                                                            rounded
+                                                            severity='danger'
+                                                            aria-label='Cancel'
+                                                            onClick={() => {
+                                                                showConfirm(
+                                                                    () => {
+                                                                        deleteFile(
+                                                                            item.id
+                                                                        );
+                                                                    }
+                                                                );
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <Image
+                                                        src={getUrlImage(
+                                                            item.imageUrl
+                                                        )}
+                                                        alt='Image'
+                                                        // width='250'
+                                                        preview
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             );
                         }
 
                         return (
-                            <div className='grid grid-cols-4 gap-4 mt-4'>
-                                {media?.map((item) => {
-                                    return (
-                                        <div
-                                            onClick={() => {
-                                                setSelectedImg(item);
-                                                onChange?.(item);
-                                            }}
-                                            className={classNames(
-                                                "h-[250px] w-full ease-out duration-300 hover:opacity-80 hover:scale-95",
-                                                {
-                                                    "scale-95 border-2 border-sky-400 border-solid":
-                                                        selectedImg?.id ===
-                                                        item.id,
-                                                }
-                                            )}
-                                            key={item.id}
-                                            style={{
-                                                backgroundImage: `url(${getUrlImage(item.imageUrl)})`,
-                                                backgroundSize: "cover",
-                                                borderRadius: "5px",
-                                                cursor: "pointer",
-                                            }}
-                                        ></div>
-                                    );
-                                })}
+                            <div>
+                                <Loading loading={isLoading} />
+
+                                <div className='grid grid-cols-4 gap-4 mt-4'>
+                                    {media?.map((item) => {
+                                        return (
+                                            <div
+                                                onClick={() => {
+                                                    setSelectedImg(item);
+                                                    onChange?.(item);
+                                                }}
+                                                className={classNames(
+                                                    "h-[250px] w-full ease-out duration-300 hover:opacity-80 hover:scale-95",
+                                                    {
+                                                        "scale-95 border-2 border-sky-400 border-solid":
+                                                            selectedImg?.id ===
+                                                            item.id,
+                                                    }
+                                                )}
+                                                key={item.id}
+                                                style={{
+                                                    backgroundImage: `url(${getUrlImage(
+                                                        item.imageUrl
+                                                    )})`,
+                                                    backgroundSize: "cover",
+                                                    borderRadius: "5px",
+                                                    cursor: "pointer",
+                                                }}
+                                            ></div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         );
                     }}

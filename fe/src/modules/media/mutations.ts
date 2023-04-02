@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "react-query";
 import { MEDIA_QUERY_KEY } from "./queries";
-import { addToSlider, uploadFile } from "./services";
+import { addToSlider, deleteMedia, uploadFile } from "./services";
 
 type Props = {
     onSuccess?: Function;
@@ -43,6 +43,23 @@ const useAddToSlider = (props?: Props) => {
             }
         },
     });
-}
+};
 
-export { useUploadFile, useAddToSlider };
+const useDeleteMedia = (props?: Props) => {
+    return useMutation({
+        mutationFn: deleteMedia,
+        onSuccess: (data) => {
+            if (props?.onSuccess) {
+                props.onSuccess(data);
+            }
+        },
+        onError: (error) => {
+            console.log("Error::", error);
+            if (props?.onError) {
+                props.onError(error);
+            }
+        },
+    });
+};
+
+export { useUploadFile, useDeleteMedia, useAddToSlider };

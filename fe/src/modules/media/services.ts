@@ -13,8 +13,12 @@ const uploadFile = (formData: FormData) => {
     });
 };
 
+const deleteMedia = (id: number) => {
+    return httpClient.delete(`/media/${id}`)
+}
+
 const addToSlider = (ids: number[]) => {
     return httpClient.post("/media/add-to-slider", ids);
 }
 
-export { getMedia, uploadFile, addToSlider };
+export { getMedia, uploadFile, deleteMedia, addToSlider };
