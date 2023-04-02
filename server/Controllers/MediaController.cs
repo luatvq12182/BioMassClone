@@ -85,7 +85,7 @@ namespace server.Controllers
                 return BadRequest();
         }
 
-        [HttpPost("{id}")]
+        [HttpPost("remove-from-slider/{id}")]
         public async Task<IActionResult> RemoveFromSlider(int id)
         {
             var image =  await _imageService.GetByIdAsync(id);
