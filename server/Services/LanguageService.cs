@@ -7,8 +7,8 @@ namespace server.Services
 {
     public interface ILanguageService : IGenericService<Language>
     {
-        public Task<Language> GetByCode(string code);
-        public bool AlreadyExist(LanguageModel language, out string message);
+        Task<Language> GetByCode(string code);
+        bool AlreadyExist(LanguageModel language, out string message);
     }
     public class LanguageService : ILanguageService
     {
@@ -31,7 +31,7 @@ namespace server.Services
 
         public async Task<IReadOnlyList<Language>> GetAllAsync()
         {
-            return await _unit.Language.GetAllAsync(); 
+            return await _unit.Language.GetAllAsync();
         }
 
         public async Task<Language> GetByIdAsync(int id)

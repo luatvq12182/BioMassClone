@@ -3,12 +3,15 @@ using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
 using Dapper;
 using MySqlConnector;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace server.DataAccess.Repositories
 {
     public interface IImageRepository : IGenericRepository<Image>
     {
-        public Task<bool> AddToSlider(int id);
+        Task<bool> AddToSlider(int id);
+        Task<bool> RemoveFromSlider(int id);
+        Task<IReadOnlyList<string>> AlreadyInUse(string imageUrl);
     }
     public class ImageRepository : IImageRepository
     {
@@ -46,6 +49,17 @@ namespace server.DataAccess.Repositories
 
         }
 
+        public async Task<IReadOnlyList<string>> AlreadyInUse(string imageUrl)
+        {
+            var query = "SELECT Title FROM Posts WHERE Body LIKE '%@ImageUrl%'";
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                var result = await connection.QueryAsync<string>(query, new { ImageUrl = imageUrl });
+                return result.ToList();
+            }
+        }
+
         public async Task<int> DeleteAsync(int id)
         {
             var sql = " DELETE FROM Images WHERE Id = @Id ";
@@ -76,6 +90,21 @@ namespace server.DataAccess.Repositories
                 connection.Open();
                 var result = await connection.QueryFirstOrDefaultAsync<Image>(query, new { Id = id });
                 return result;
+            }
+        }
+
+        public async  Task<bool> RemoveFromSlider(int id)
+        {
+            var sql = "UPDATE Images SET ShowOnSlider = 0 WHERE Id = @Id";
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                var result = await connection.ExecuteAsync(sql, new { Id = id });
+                if(result > 0)
+                {
+                    return true;
+                }
+                return false;
             }
         }
 

@@ -7,7 +7,7 @@ namespace server.Services
 {
     public interface ICatLangService : IGenericService<CatLang>
     {
-        public Task<IReadOnlyList<CategoryModel>> GetByCategoryId(int id);
+        Task<IReadOnlyList<CategoryModel>> GetByCategoryId(int id);
     }
     public class CatLangService :  ICatLangService
     {

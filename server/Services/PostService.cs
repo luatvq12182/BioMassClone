@@ -9,9 +9,9 @@ namespace server.Services
 {
     public interface IPostService : IGenericService<Post>
     {
-        public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
-        public Task<IReadOnlyList<PostModel>> InsertTransactional(IReadOnlyList<PostModel> model);
-        public Task<IReadOnlyList<PostModel>> UpDateTransactional(IReadOnlyList<PostModel> model);
+        Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
+        Task<IReadOnlyList<PostModel>> InsertTransactional(IReadOnlyList<PostModel> model);
+        Task<IReadOnlyList<PostModel>> UpDateTransactional(IReadOnlyList<PostModel> model);
     }
     public class PostService : IPostService
     {
