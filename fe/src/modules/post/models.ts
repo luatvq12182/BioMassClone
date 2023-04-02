@@ -30,4 +30,5 @@ export type GetPostsParams = {
 export type GetPostParams = {
     id: number;
     lang?: string;
+    onSuccess: (data: IPost[]) => void
 };

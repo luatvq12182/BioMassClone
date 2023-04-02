@@ -9,12 +9,18 @@ const getPosts = ({ lang, pageSize, pageNumber }: GetPostsParams) => {
     );
 };
 
-const getPost = (id: number, lang: string) => {
-    return httpClient.get<IPost[]>(`/posts/${id}${lang ? `?lang=${lang}` : ''}`)
-}
+const getPost = (id: number, lang?: string) => {
+    return httpClient.get<IPost[]>(
+        `/posts/${id}${lang ? `?lang=${lang}` : ""}`
+    );
+};
 
 const createPost = (payload: IPost[]) => {
-    return httpClient.post('/posts', payload)
-}
+    return httpClient.post("/posts", payload);
+};
 
-export { getPosts, getPost, createPost };
+const updatePost = (payload: IPost[], id: number) => {
+    return httpClient.put(`/posts/${id}`, payload);
+};
+
+export { getPosts, getPost, createPost, updatePost };

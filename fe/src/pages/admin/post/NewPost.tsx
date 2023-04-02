@@ -19,7 +19,7 @@ const NewPost = () => {
     const [payload, setPayload] = useState<IPost[]>([]);
     const { mutate: createPost, isLoading } = useCreatePost({
         onSuccess: () => {
-            // navigate("/admin/post");
+            navigate("/admin/post");
         },
     });
     const [isOpenMedia, setIsOpenMedia] = useState<boolean>(false);
