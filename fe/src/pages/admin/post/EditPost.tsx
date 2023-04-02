@@ -27,7 +27,7 @@ const EditPost = () => {
         Number(postIdParam),
         {
             onSuccess: () => {
-                navigate("/admin/post");
+                window.location.href = '/admin/post'
             },
         }
     );
@@ -97,8 +97,6 @@ const EditPost = () => {
         setMedia(media);
         console.log(media);
     };
-
-    console.log("???", payload);
 
     if (isError) {
         return (
