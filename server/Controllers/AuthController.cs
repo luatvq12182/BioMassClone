@@ -49,10 +49,10 @@ namespace server.Controllers
                 {
                     return BadRequest("");
                 }
-                if ( await _userService.AlreadyExist(model))
-                {
-                    return BadRequest();
-                }
+                //if ( await _userService.AlreadyExist(model))
+                //{
+                //    return BadRequest();
+                //}
                 else
                 {
                     var user = new User

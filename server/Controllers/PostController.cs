@@ -76,11 +76,22 @@ namespace server.Controllers
             }          
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Add(IReadOnlyList<PostModel> model)
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] IReadOnlyList<PostModel> model)
         {
-            var data = await _postService.InsertTransactional(model);
-            return Ok(data);
+            var post = await _postService.GetByIdAsync(id);
+
+            if (post == null)
+            {
+                return NotFound("No post found with special id !");
+            }
+            else
+            {
+                var data = await _postService.UpDateTransactional(model);
+                return Ok(data);
+            }
         }
+
     }
 }

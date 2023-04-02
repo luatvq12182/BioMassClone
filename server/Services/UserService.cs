@@ -18,9 +18,9 @@ namespace server.Services
             _unit = unitOfWork;
         }
 
-        public Task<User> AddAsync(User entity)
+        public async Task<User> AddAsync(User entity)
         {
-            throw new NotImplementedException();
+            return await _unit.User.AddAsync(entity);
         }
 
         public async Task<bool> AlreadyExist(RegisterModel model)

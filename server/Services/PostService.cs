@@ -110,22 +110,30 @@ namespace server.Services
         public async Task<IReadOnlyList<PostModel>> UpDateTransactional(IReadOnlyList<PostModel> model)
         {
             var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
-            await _unit.Post.UpdateTransactionalAsync(standardItem.MapToEntity());
-            var specificItems = model.Where(x => x.LanguageId.HasValue && x.LanguageId.Value > 0).ToList();
+            if (standardItem != null)
+            {
+                await _unit.Post.UpdateTransactionalAsync(standardItem.MapToEntity());
+                var specificItems = model.Where(x => x.LanguageId.HasValue && x.LanguageId.Value > 0).ToList();
 
-            if (specificItems != null && specificItems.Any())
-            {
-                foreach (var postLang in specificItems)
+                if (specificItems != null && specificItems.Any())
                 {
-                    await _unit.PostLang.UpdateTransactional(postLang.MapToPostLangEntity());
+                    foreach (var postLang in specificItems)
+                    {
+                        await _unit.PostLang.UpdateTransactional(postLang.MapToPostLangEntity());
+                    }
                 }
-            }
-            if (await _unit.CommitThings())
-            {
-                return model;
+                if (await _unit.CommitThings())
+                {
+                    return model;
+                }
+                else
+                    return null;
             }
             else
+            {
                 return null;
+            }
+
         }
     }
 }
