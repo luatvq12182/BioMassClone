@@ -8,13 +8,9 @@ type Props = {
 };
 
 const useUploadFile = (props?: Props) => {
-    const queryClient = useQueryClient();
-
     return useMutation({
         mutationFn: uploadFile,
         onSuccess: (data) => {
-            queryClient.invalidateQueries(MEDIA_QUERY_KEY);
-
             if (props?.onSuccess) {
                 props.onSuccess(data);
             }

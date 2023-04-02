@@ -5,7 +5,7 @@ export const MEDIA_QUERY_KEY = "MEDIA_QUERY_KEY";
 
 const useMedia = () => {
     return useQuery({
-        queryKey: MEDIA_QUERY_KEY,
+        queryKey: [MEDIA_QUERY_KEY],
         queryFn: getMedia,
         refetchOnMount: false,
         refetchOnWindowFocus: false,

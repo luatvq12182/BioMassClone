@@ -10,6 +10,7 @@ import { TabView, TabPanel } from "primereact/tabview";
 import { Card } from "primereact/card";
 import { Image } from "primereact/image";
 
+import useMedia from "@/modules/media/queries";
 import { IMedia, MediaProvider, useUploadFile } from "@/modules/media";
 
 type Props = {
@@ -19,8 +20,8 @@ type Props = {
 };
 
 const Media = ({ isDialog = false, value = null, onChange }: Props) => {
+    const { refetch } = useMedia();
     const [selectedImg, setSelectedImg] = useState<IMedia | null>(value);
-
     const { mutate: uploadMedia } = useUploadFile({
         onSuccess: () => {
             (fileUploadRef.current as any).clear();
@@ -30,6 +31,8 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
                 summary: "Success",
                 detail: "File Uploaded",
             });
+
+            refetch();
         },
     });
 
@@ -213,7 +216,7 @@ const Media = ({ isDialog = false, value = null, onChange }: Props) => {
                                 <div className='grid grid-cols-4 gap-4 mt-4'>
                                     {media?.map((item) => {
                                         return (
-                                            <div>
+                                            <div key={item.id}>
                                                 <Image
                                                     src={getUrlImage(item.imageUrl)}
                                                     className='rounded-lg'
