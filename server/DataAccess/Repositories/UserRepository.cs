@@ -77,7 +77,7 @@ namespace server.DataAccess.Repositories
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.QuerySingleAsync<int>(sql);
+                var result = await connection.QuerySingleAsync<int>(sql,entity);
                 entity.Id = result;
                 return entity;
             }
