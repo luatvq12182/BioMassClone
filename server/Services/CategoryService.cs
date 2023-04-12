@@ -141,7 +141,12 @@ namespace server.Services
             {
                 foreach (var catLang in specificItems)
                 {
-                    await _unit.CatLang.UpdateTransactionalAsync(catLang.MapToCatLangEntity());
+                    if(catLang.Id == 0)
+                    {
+                        await _unit.CatLang.AddTransactionalAsync(catLang.MapToCatLangEntity());
+                    }
+                    else
+                        await _unit.CatLang.UpdateTransactionalAsync(catLang.MapToCatLangEntity());
                 }
             }
             if (await _unit.CommitThings())
