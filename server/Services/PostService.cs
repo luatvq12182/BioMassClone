@@ -119,7 +119,13 @@ namespace server.Services
                 {
                     foreach (var postLang in specificItems)
                     {
-                        await _unit.PostLang.UpdateTransactional(postLang.MapToPostLangEntity());
+                        if(postLang.Id ==0)
+                        {
+                            postLang.PostId = standardItem.Id;
+                            await _unit.PostLang.AddTransactionalAsync(postLang.MapToPostLangEntity());
+                        }
+                        else
+                            await _unit.PostLang.UpdateTransactional(postLang.MapToPostLangEntity());
                     }
                 }
                 if (await _unit.CommitThings())

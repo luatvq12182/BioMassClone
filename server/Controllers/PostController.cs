@@ -92,6 +92,12 @@ namespace server.Controllers
                 return Ok(data);
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> Add([FromBody] IReadOnlyList<PostModel> model)
+        {
+            var data = await _postService.InsertTransactional(model);
+            return Ok(data);         
+        }
 
     }
 }

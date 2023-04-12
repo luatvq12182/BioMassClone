@@ -48,7 +48,7 @@ namespace server.DataAccess.Repositories
         public async Task<PostLang> AddTransactionalAsync(PostLang entity)
         {
             var sql = "INSERT INTO PostLangs (PostId, LanguageId , Title, Body ,ShortDescription) VALUES (@PostId,@LanguageId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
-            var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
+            var result = await _session.Connection.QueryFirstOrDefaultAsync<int>(sql, entity, _session.Transaction);
             entity.Id = result;
             return entity;
         }

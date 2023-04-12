@@ -107,14 +107,14 @@ namespace server.DataAccess.Repositories
         {
             var sql = "INSERT INTO Posts (CategoryId,Title,Thumbnail, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title,@Thumbnail, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
 
-            var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
+            var result = await _session.Connection.QueryFirstOrDefaultAsync<int>(sql, entity, _session.Transaction);
             entity.Id = result;
             return entity;
         }
 
         public async Task<Post> UpdateTransactionalAsync(Post post)
         {
-            var sql = "UPDATE Posts SET CategoryId = @CategoryId , Title = @Title, Body=@Body ,ShortDescription=@ShortDescription ,Views = @Views , Author=@Author WHERE Id=@Id ";
+            var sql = "UPDATE Posts SET CategoryId = @CategoryId , Title = @Title, Body=@Body ,ShortDescription=@ShortDescription ,Views = @Views , Author=@Author ,Thumbnail= @Thumbnail WHERE Id=@Id ";
             var result = await _session.Connection.ExecuteAsync(sql, post, _session.Transaction);
             if (result > 0)
             {
