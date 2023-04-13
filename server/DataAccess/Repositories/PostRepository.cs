@@ -14,6 +14,7 @@ namespace server.DataAccess.Repositories
         public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
         public Task<Post> AddTransactionalAsync(Post post);
         public Task<Post> UpdateTransactionalAsync(Post post);
+        public Task<bool> DeleteTransactionalAsync(int id);
     }
     public class PostRepository : IPostRepository
     {
@@ -121,6 +122,17 @@ namespace server.DataAccess.Repositories
                 return post;
             }
             return null;
+        }
+
+        public async Task<bool> DeleteTransactionalAsync(int id)
+        {
+            var sql = " DELETE FROM Posts WHERE Id = @Id ";
+            var result = await _session.Connection.ExecuteAsync(sql, new { Id = id }, _session.Transaction);
+            if (result > 0)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

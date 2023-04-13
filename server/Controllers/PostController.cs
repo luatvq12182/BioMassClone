@@ -98,6 +98,24 @@ namespace server.Controllers
             var data = await _postService.InsertTransactional(model);
             return Ok(data);         
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute]int id)
+        {
+            var post = await _postService.GetByIdAsync(id);
+
+            if (post == null)
+            {
+                return NotFound("No post found with special id !");
+            }
+            else
+            {
+                var isSuccess = await _postService.DeleteTransactional(id);
+                if (isSuccess)
+                    return Ok();
+                else 
+                    return BadRequest();
+            }
+        }
 
     }
 }

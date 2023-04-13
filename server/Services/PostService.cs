@@ -12,6 +12,7 @@ namespace server.Services
         Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
         Task<IReadOnlyList<PostModel>> InsertTransactional(IReadOnlyList<PostModel> model);
         Task<IReadOnlyList<PostModel>> UpDateTransactional(IReadOnlyList<PostModel> model);
+        Task<bool> DeleteTransactional(int id);
     }
     public class PostService : IPostService
     {
@@ -140,6 +141,18 @@ namespace server.Services
                 return null;
             }
 
+        }
+
+        public async Task<bool> DeleteTransactional(int id)
+        {
+            var result = false;
+            await _unit.PostLang.DeleteTransactionalAsync(id);
+            await _unit.Post.DeleteTransactionalAsync(id);
+            if( await _unit.CommitThings())
+            {
+                result = true;
+            }
+            return result;
         }
     }
 }

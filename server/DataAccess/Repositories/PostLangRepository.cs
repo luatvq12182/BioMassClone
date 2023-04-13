@@ -3,6 +3,7 @@ using MySqlConnector;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
+using static Dapper.SqlMapper;
 
 namespace server.DataAccess.Repositories
 {
@@ -13,6 +14,7 @@ namespace server.DataAccess.Repositories
         public Task<PostLang> AddTransactionalAsync(PostLang entity);
         public Task<IReadOnlyList<PostLang>> GetAllBySpecificLang(int languageId);
         public Task<PostLang> UpdateTransactional (PostLang entity);
+        public Task<bool> DeleteTransactionalAsync(int postId);
     }
     public class PostLangRepository :IPostLangRepository
     {
@@ -62,6 +64,17 @@ namespace server.DataAccess.Repositories
                 var result = await connection.ExecuteAsync(sql);
                 return result;
             }
+        }
+
+        public async Task<bool> DeleteTransactionalAsync(int postId)
+        {
+            var sql = "DELETE FROM PostLangs WHERE PostId = @PostId ";
+            var result = await _session.Connection.ExecuteAsync(sql, new {PostId = postId }, _session.Transaction);
+            if (result > 0)
+            {
+                return true;
+            }
+            return false;
         }
 
         public async Task<IReadOnlyList<PostLang>> GetAllAsync()
