@@ -25,7 +25,7 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Category> AddAsync(Category entity)
         {
-            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Categories (Slug,Name,ShowOnHeaderMenu,IsStaticCategory) VALUES(@Slug,@Name,@ShowOnHeaderMenu,@IsStaticCategory) ; SELECT LAST_INSERT_ID() ";
 
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
@@ -38,7 +38,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<Category> AddTransactionalAsync(Category entity)
         {
-            var sql = "INSERT INTO Categories (Slug,Name) VALUES(@Slug,@Name) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Categories (Slug,Name,ShowOnHeaderMenu,IsStaticCategory) VALUES(@Slug,@Name,@ShowOnHeaderMenu,@IsStaticCategory) ; SELECT LAST_INSERT_ID() ";
 
             var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
             entity.Id = result;
@@ -95,7 +95,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<Category> UpdateAsync(Category entity)
         {
-            var sql = "UPDATE Categories  SET Slug=@Slug , Name = @Name WHERE Id = @Id ";
+            var sql = "UPDATE Categories  SET Slug=@Slug , Name = @Name WHERE , ShowOnHeaderMenu = @ShowOnHeaderMenu , IsStaticCategory = @IsStaticCategory WHERE Id = @Id ";
 
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
@@ -123,7 +123,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<Category> UpdateTransactionalAsync(Category entity)
         {
-            var sql = "UPDATE Categories  SET Slug=@Slug , Name = @Name WHERE Id = @Id ";
+            var sql = "UPDATE Categories  SET Slug=@Slug , Name = @Name , ShowOnHeaderMenu = @ShowOnHeaderMenu , IsStaticCategory = @IsStaticCategory WHERE Id = @Id ";
             var result = await _session.Connection.ExecuteAsync(sql, entity, _session.Transaction);
             return result > 0 ? entity : null;
 

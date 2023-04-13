@@ -7,5 +7,7 @@
         public int? LanguageId { get; set; }
         public string Name { get; set; }
         public string Slug { get; set; }
+        public bool IsStaticCategory { get; set; }
+        public bool ShowOnHeaderMenu { get; set; }
     }
 }

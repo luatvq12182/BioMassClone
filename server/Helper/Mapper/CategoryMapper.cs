@@ -11,7 +11,9 @@ namespace server.Helper.Mapper
             {
                 Id = model.Id,
                 Name = model.Name,
-                Slug = model.Slug
+                Slug = model.Slug,
+                IsStaticCategory= model.IsStaticCategory,
+                ShowOnHeaderMenu= model.ShowOnHeaderMenu,
             };
         }
         public static CategoryModel MapToModel(this Category entity)
@@ -20,7 +22,9 @@ namespace server.Helper.Mapper
             {
                 Id= entity.Id,
                 Name = entity.Name,
-                Slug = entity.Slug
+                Slug = entity.Slug,
+                IsStaticCategory= entity.IsStaticCategory,
+                ShowOnHeaderMenu= entity.ShowOnHeaderMenu,
             };
         }
         public static List<Category> MapToCatLangEntities(this List<CategoryModel> models)
