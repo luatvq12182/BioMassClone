@@ -110,3 +110,7 @@ ol a.active {
     background-color: var(--highlight-bg);
     color: var(--highlight-text-color);
 }
+
+.p-menu {
+    z-index: 9999 !important;
+}

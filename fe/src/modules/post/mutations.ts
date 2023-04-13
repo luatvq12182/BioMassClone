@@ -1,6 +1,6 @@
 import { useMutation } from "react-query";
 import { IPost } from "./models";
-import { createPost, updatePost } from "./services";
+import { createPost, deletePost, updatePost } from "./services";
 
 type Props = {
     onSuccess?: Function;
@@ -41,4 +41,21 @@ const useUpdatePost = (id: number, props?: Props) => {
     });
 };
 
-export { useCreatePost, useUpdatePost }
+const useDeletePost = (props?: Props) => {
+    return useMutation({
+        mutationFn: deletePost,
+        onSuccess: (data) => {
+            if (props?.onSuccess) {
+                props?.onSuccess(data);
+            }
+        },
+        onError: (error) => {
+            console.log("Error::", { error });
+            if (props?.onError) {
+                props?.onError(error);
+            }
+        },
+    });
+};
+
+export { useCreatePost, useUpdatePost, useDeletePost };

@@ -23,4 +23,8 @@ const updatePost = (payload: IPost[], id: number) => {
     return httpClient.put(`/posts/${id}`, payload);
 };
 
-export { getPosts, getPost, createPost, updatePost };
+const deletePost = (id: number) => {
+    return httpClient.delete(`/posts/${id}`);
+};
+
+export { getPosts, getPost, createPost, updatePost, deletePost };

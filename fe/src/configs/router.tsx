@@ -16,10 +16,6 @@ import {
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <h1>Home page</h1>,
-    },
-    {
-        path: "admin",
         element: (
             <ProtectedRoute>
                 <AdminLayout />

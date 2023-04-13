@@ -6,11 +6,29 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { TabPanel, TabView } from "primereact/tabview";
 
-import { IPost, PagingableResponse, PostProvider } from "@/modules/post";
+import {
+    IPost,
+    PagingableResponse,
+    PostProvider,
+    useDeletePost,
+    // usePosts,
+} from "@/modules/post";
 import { useLangs } from "@/modules/lang";
+import { showConfirm } from "@/utils";
 
 const PostList = () => {
     const navigate = useNavigate();
+    // const { refetch } = usePosts({ lang: "" });
+    const { mutate: deletePost, isLoading: isDeleting } = useDeletePost({
+        onSuccess: () => {
+            window.location.reload();
+        },
+    });
+
+    const handleClickDelete = (id: number) => {
+        showConfirm(() => deletePost(id));
+    };
+
     const columns = [
         {
             field: "index",
@@ -65,10 +83,8 @@ const PostList = () => {
                             }}
                         />
                         <Button
-                            // disabled={isDeleting}
-                            // onClick={() =>
-                            //     handleClickDelete(e.categoryId || e.id)
-                            // }
+                            disabled={isDeleting}
+                            onClick={() => handleClickDelete(e.postId || e.id)}
                             icon='pi pi-trash'
                             rounded
                             text
