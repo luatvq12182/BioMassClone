@@ -48,15 +48,16 @@ namespace server.Services
         }
         public async Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model)
         {
+            List<PostModel> Items = new List<PostModel>();
+            int TotalCount;
+
             if (!string.IsNullOrEmpty(model.Lang))
             {
                 var language = await _unit.Language.GetByCode(model.Lang);
                 if (language != null)
                 {
-                    List<PostModel> Items = new List<PostModel>();
-                    int TotalCount;
                     var postLangs = await _unit.PostLang.GetAllBySpecificLang(language.Id);
-                    var posts = await _unit.Post.GetAllAsync();
+                    var posts = await _unit.Post.SearchPost(model);
                     if (posts != null && posts.Any())
                     {
                         foreach (var post in posts)
@@ -80,7 +81,20 @@ namespace server.Services
                 else { return null; }
 
             }
-            return await _unit.Post.GetPagedPost(model);
+            else
+            {
+                var posts = await _unit.Post.SearchPost(model);
+                if (posts != null && posts.Any())
+                {
+                    foreach (var post in posts)
+                    {
+                        var postModel = post.MapToModel();
+                        Items.Add(postModel);
+                    }
+                }
+                TotalCount = Items.Count;
+                return new PaginatedList<PostModel>(Items, TotalCount, model.PageNumber, model.Pagesize);
+            }
         }
 
         public async Task<IReadOnlyList<PostModel>> InsertTransactional(IReadOnlyList<PostModel> model)
@@ -88,7 +102,7 @@ namespace server.Services
             var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
             if (standardItem != null)
             {
-                standardItem.CreatedDate= DateTime.Now;
+                standardItem.CreatedDate = DateTime.Now;
                 var insertedPost = await _unit.Post.AddTransactionalAsync(standardItem.MapToEntity());
                 var spescificItems = model.Where(x => x.LanguageId > 0).ToList();
                 if (spescificItems != null && spescificItems.Any())
@@ -120,7 +134,7 @@ namespace server.Services
                 {
                     foreach (var postLang in specificItems)
                     {
-                        if(postLang.Id ==0)
+                        if (postLang.Id == 0)
                         {
                             postLang.PostId = standardItem.Id;
                             await _unit.PostLang.AddTransactionalAsync(postLang.MapToPostLangEntity());
@@ -148,11 +162,11 @@ namespace server.Services
             var result = false;
             await _unit.PostLang.DeleteTransactionalAsync(id);
             await _unit.Post.DeleteTransactionalAsync(id);
-            if( await _unit.CommitThings())
+            if (await _unit.CommitThings())
             {
                 result = true;
             }
             return result;
-        }
+        }     
     }
 }

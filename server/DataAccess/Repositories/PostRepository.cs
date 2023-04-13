@@ -15,6 +15,8 @@ namespace server.DataAccess.Repositories
         public Task<Post> AddTransactionalAsync(Post post);
         public Task<Post> UpdateTransactionalAsync(Post post);
         public Task<bool> DeleteTransactionalAsync(int id);
+        public Task<IReadOnlyList<Post>> SearchPost(PostSearchModel model);
+
     }
     public class PostRepository : IPostRepository
     {
@@ -133,6 +135,18 @@ namespace server.DataAccess.Repositories
                 return true;
             }
             return false;
+        }
+        public async Task<IReadOnlyList<Post>> SearchPost(PostSearchModel model)
+        {
+            var whereCondition = model.CategoryId == null ? " " : " WHERE CategoryId = @CategoryId ";
+            var query = "Select * From Posts " + whereCondition ;
+
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                var result = await connection.QueryAsync<Post>(query);
+                return result.ToList();
+            }
         }
     }
 }
