@@ -50,12 +50,17 @@ namespace server.Controllers
                     var language = await _languageService.GetByCode(lang);
                     if (language == null)
                     {
-                        return Ok(post.MapToModel());
+                        return BadRequest("No specific lang with the code");
                     }
                     else
                     {
                         var postLang = await _postLangService.GetBySpecificLang(id, language.Id);
-                        return Ok(Utilities.MapToPostModel(post, postLang));
+                        if (postLang == null)
+                        {
+                            return Ok();
+                        }
+                        else
+                            return Ok(Utilities.MapToPostModel(post, postLang));
                     }
                 }
                 else
