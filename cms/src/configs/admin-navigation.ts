@@ -8,22 +8,22 @@ const ADMIN_NAVIGATION: NavigationProps[] = [
     {
         label: "Category",
         icon: "pi pi-list",
-        to: "/admin/category",
+        to: "/category",
     },
     {
         label: "Media",
         icon: "pi pi-cloud-upload",
-        to: "/admin/media",
+        to: "/media",
     },
     {
         label: "Post",
         icon: "pi pi-book",
-        to: "/admin/post",
+        to: "/post",
     },
     {
         label: "Slider",
         icon: "pi pi-sliders-h",
-        to: "/admin/slider",
+        to: "/slider",
     },
 ];
 
