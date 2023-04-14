@@ -76,6 +76,7 @@ namespace server.Services
                         }
                     }
                     TotalCount = Items.Count;
+                    Items = Items.OrderByDescending(p=>p.CreatedDate).ToList(); 
                     return new PaginatedList<PostModel>(Items, TotalCount, model.PageNumber, model.Pagesize);
                 }
                 else { return null; }
@@ -93,6 +94,7 @@ namespace server.Services
                     }
                 }
                 TotalCount = Items.Count;
+                Items = Items.OrderByDescending(p => p.CreatedDate).ToList();
                 return new PaginatedList<PostModel>(Items, TotalCount, model.PageNumber, model.Pagesize);
             }
         }
