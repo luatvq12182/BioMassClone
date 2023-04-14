@@ -8,7 +8,6 @@ using server.DataAccess.Entities;
 namespace server.Controllers
 {
     [ApiController]
-    [Authorize]
     [Route("api/media")]
     public class MediaController : ControllerBase
     {
@@ -83,6 +82,7 @@ namespace server.Controllers
             var data = await _imageService.GetByIdAsync(id);
             return Ok(data);
         }
+        [Authorize]
         [HttpPost("add-to-slider")]
         public async Task<IActionResult> AddToSlider([FromBody] List<int> ids)
         {
@@ -91,7 +91,7 @@ namespace server.Controllers
             else
                 return BadRequest();
         }
-
+        [Authorize]
         [HttpPost("remove-from-slider/{id}")]
         public async Task<IActionResult> RemoveFromSlider(int id)
         {
@@ -109,12 +109,14 @@ namespace server.Controllers
                 }
             }
         }
+        [Authorize]
         [HttpGet("is-already-in-use")]
         public async Task<IActionResult> AlreadyInUse(string imageUrl)
         {
             var data = await _imageService.AlreadyInUse(imageUrl);
             return Ok(data);
         }
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete (int id)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using server.DataAccess.Entities;
 using server.Helper;
 using server.Helper.Mapper;
@@ -81,7 +82,7 @@ namespace server.Controllers
             }          
         }
 
-
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id , [FromBody] IReadOnlyList<PostModel> model)
         {
@@ -97,12 +98,14 @@ namespace server.Controllers
                 return Ok(data);
             }
         }
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] IReadOnlyList<PostModel> model)
         {
             var data = await _postService.InsertTransactional(model);
             return Ok(data);         
         }
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute]int id)
         {
