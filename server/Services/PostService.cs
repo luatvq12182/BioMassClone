@@ -58,6 +58,12 @@ namespace server.Services
                 {
                     var postLangs = await _unit.PostLang.GetAllBySpecificLang(language.Id);
                     var posts = await _unit.Post.SearchPost(model);
+                    var standardPostOnly = posts.Where(x => !postLangs.Select(p => p.PostId).ToList().Contains(x.Id)).ToList();
+                    if(standardPostOnly != null && standardPostOnly.Count > 0)
+                    {
+                        Items.AddRange(standardPostOnly.MapToModels());
+                    }
+
                     if (posts != null && posts.Any())
                     {
                         foreach (var post in posts)
