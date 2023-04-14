@@ -132,7 +132,7 @@ const PostList = () => {
                         label='New post'
                         icon='pi pi-plus'
                         onClick={() => {
-                            navigate("/admin/post/new");
+                            navigate("/post/new");
                         }}
                     />
                 </div>

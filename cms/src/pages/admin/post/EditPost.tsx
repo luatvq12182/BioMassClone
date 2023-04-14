@@ -121,7 +121,7 @@ const EditPost = () => {
                     icon='pi pi-backward'
                     label='Post list'
                     onClick={() => {
-                        navigate("/admin/post");
+                        navigate("/post");
                     }}
                 />
             </div>

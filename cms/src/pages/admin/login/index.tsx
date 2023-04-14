@@ -22,7 +22,7 @@ const Login = () => {
         document.title = "Login";
 
         if (tokenLocal) {
-            navigate("/admin");
+            navigate("/");
         }
     }, []);
 
@@ -49,7 +49,7 @@ const Login = () => {
 
             setTokenLocal(res.data.token);
 
-            window.location.href = "/admin";
+            window.location.href = "/";
         } catch (error: any) {
             console.log("Error when login:", error);
             if (+error.response.status === 401) {
