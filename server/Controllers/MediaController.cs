@@ -69,6 +69,13 @@ namespace server.Controllers
             var data = await _imageService.GetAllAsync();
             return Ok(data);
         }
+        [HttpGet("slider-images")]
+        public async Task<IActionResult> GetSliderImages()
+        {
+            var data = await _imageService.GetAllAsync();
+            data = data.Where(x => x.ShowOnSlider == true).ToList();
+            return Ok(data);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
