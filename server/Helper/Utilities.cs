@@ -73,9 +73,9 @@ namespace server.Helper
             }
             return url;
         }
-        public static PostModel MapToPostModel(Post post , PostLang postLang)
+        public static PostViewModel MapToPostModel(Post post , PostLang postLang)
         {
-            return new PostModel
+            return new PostViewModel
             {
                 Id = postLang.Id,
                 PostId = post.Id,
@@ -87,7 +87,9 @@ namespace server.Helper
                 ShortDescription = postLang.ShortDescription,
                 Author = post.Author,
                 CreatedDate = post.CreatedDate,
-                Views = post.Views
+                Views = post.Views,
+                Slug = postLang.Slug,
+                IsShowOnHomePage = post.IsShowOnHomePage
             };
         }
     }
