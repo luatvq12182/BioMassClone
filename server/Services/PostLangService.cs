@@ -39,7 +39,7 @@ namespace server.Services
 
         public async Task<IReadOnlyList<PostLang>> GetByPostId(int id)
         {
-            return await _unit.PostLang.GetPostId(id);
+            return await _unit.PostLang.GetByPostId(id);
         }
 
         public  async Task<PostLang> GetBySpecificLang(int postId, int langId)

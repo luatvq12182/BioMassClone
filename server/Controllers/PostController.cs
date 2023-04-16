@@ -15,11 +15,11 @@ namespace server.Controllers
         private readonly IPostService _postService;
         private readonly IPostLangService _postLangService;
         private readonly ILanguageService _languageService;
-        public PostController(IPostService postService , IPostLangService postLangService , ILanguageService languageService)
+        public PostController(IPostService postService, IPostLangService postLangService, ILanguageService languageService)
         {
-            _postService= postService;
-            _postLangService= postLangService;
-            _languageService= languageService;
+            _postService = postService;
+            _postLangService = postLangService;
+            _languageService = languageService;
         }
 
 
@@ -35,56 +35,37 @@ namespace server.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetDetails( [FromRoute] int id , [FromQuery] string? lang)
+        public async Task<IActionResult> GetDetails([FromRoute] int id, [FromQuery] string? lang)
         {
-
             var post = await _postService.GetByIdAsync(id);
 
-            if(post == null )
+            if (post == null)
             {
                 return NotFound("No post found with special id !");
             }
             else
             {
-                if (!string.IsNullOrEmpty(lang))
+                var language = await _languageService.GetByCode(lang);
+                if (language == null)
                 {
-                    var language = await _languageService.GetByCode(lang);
-                    if (language == null)
-                    {
-                        return BadRequest("No specific lang with the code");
-                    }
-                    else
-                    {
-                        var postLang = await _postLangService.GetBySpecificLang(id, language.Id);
-                        if (postLang == null)
-                        {
-                            return Ok();
-                        }
-                        else
-                            return Ok(Utilities.MapToPostModel(post, postLang));
-                    }
+                    return BadRequest("No specific lang with the code");
                 }
                 else
                 {
-                    var result = new List<PostModel>();
-                    result.Add(post.MapToModel());
-                    var postLangs = await _postLangService.GetByPostId(id);
-                    if(postLangs != null && postLangs.Any())
+                    var postLang = await _postLangService.GetBySpecificLang(id, language.Id);
+                    if (postLang == null)
                     {
-                        foreach(var postLang in postLangs)
-                        {
-                            var postModel = Utilities.MapToPostModel(post, postLang);
-                            result.Add(postModel);
-                        }
+                        return Ok();
                     }
-                    return Ok(result);
+                    else
+                        return Ok(Utilities.MapToPostModel(post, postLang));
                 }
-            }          
+            }
         }
 
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id , [FromBody] IReadOnlyList<PostModel> model)
+        public async Task<IActionResult> Update(int id, [FromBody] PostModel model)
         {
             var post = await _postService.GetByIdAsync(id);
 
@@ -100,14 +81,14 @@ namespace server.Controllers
         }
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] IReadOnlyList<PostModel> model)
+        public async Task<IActionResult> Add([FromBody] PostModel model)
         {
             var data = await _postService.InsertTransactional(model);
-            return Ok(data);         
+            return Ok(data);
         }
         [Authorize]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute]int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var post = await _postService.GetByIdAsync(id);
 
@@ -120,7 +101,7 @@ namespace server.Controllers
                 var isSuccess = await _postService.DeleteTransactional(id);
                 if (isSuccess)
                     return Ok();
-                else 
+                else
                     return BadRequest();
             }
         }

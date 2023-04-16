@@ -5,18 +5,15 @@ using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
 using server.ViewModel.Commons;
 using server.ViewModel.Posts;
-using static Dapper.SqlMapper;
+
 
 namespace server.DataAccess.Repositories
 {
     public interface IPostRepository : IGenericRepository<Post>
     {
-        public Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
         public Task<Post> AddTransactionalAsync(Post post);
         public Task<Post> UpdateTransactionalAsync(Post post);
         public Task<bool> DeleteTransactionalAsync(int id);
-        public Task<IReadOnlyList<Post>> SearchPost(PostSearchModel model);
-
     }
     public class PostRepository : IPostRepository
     {
@@ -29,7 +26,7 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Post> AddAsync(Post entity)
         {
-            var sql = "INSERT INTO Posts (CategoryId,Title, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Posts (CategoryId,CreatedDate , Views , Author , IsShowOnHomePage) VALUES (@CategoryId, @CreatedDate, @Views, @Author,@IsShowOnHomePage) ; SELECT LAST_INSERT_ID() ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
@@ -74,7 +71,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<Post> UpdateAsync(Post entity)
         {
-            var sql = "UPDATE Posts SET CategoryId = @CategoryId , Title = @Title, Body=@Body ,ShortDescription=@ShortDescription ,Views = @Views , Author=@Author WHERE Id=@Id ";
+            var sql = "UPDATE Posts SET CategoryId = @CategoryId ,Views = @Views , Author=@Author , IsShowOnHomePage = @IsShowOnHomePage WHERE Id=@Id ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
@@ -87,28 +84,9 @@ namespace server.DataAccess.Repositories
                 return null;
             }
         }
-        public async Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model)
-        {
-            List<PostModel> items;
-            var offSet = model.Pagesize * (model.PageNumber - 1);
-            int totalCount;
-            var query = "Select * From Posts LIMIT @PageSize  OFFSET @OffSet ; SELECT COUNT(*) FROM Posts ";
-
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
-            {
-                connection.Open();
-                using (var multi = await connection.QueryMultipleAsync(query, new { PageSize = model.Pagesize, OffSet = offSet }))
-                {
-                    items = multi.Read<PostModel>().ToList();
-                    totalCount = multi.ReadFirst<int>();
-                }
-            }
-            return new PaginatedList<PostModel>(items, totalCount, model.PageNumber, model.Pagesize);
-        }
-
         public async Task<Post> AddTransactionalAsync(Post entity)
         {
-            var sql = "INSERT INTO Posts (CategoryId,Title,Thumbnail, Body ,ShortDescription , CreatedDate , Views , Author) VALUES (@CategoryId, @Title,@Thumbnail, @Body ,@ShortDescription, @CreatedDate, @Views, @Author) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Posts (CategoryId , CreatedDate , Views , Author , IsShowOnHomePage) VALUES (@CategoryId,  @CreatedDate, @Views, @Author , @IsShowOnHomePage) ; SELECT LAST_INSERT_ID() ";
 
             var result = await _session.Connection.QueryFirstOrDefaultAsync<int>(sql, entity, _session.Transaction);
             entity.Id = result;
@@ -117,7 +95,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<Post> UpdateTransactionalAsync(Post post)
         {
-            var sql = "UPDATE Posts SET CategoryId = @CategoryId , Title = @Title, Body=@Body ,ShortDescription=@ShortDescription ,Views = @Views , Author=@Author ,Thumbnail= @Thumbnail WHERE Id=@Id ";
+            var sql = "UPDATE Posts SET CategoryId = @CategoryId ,Views = @Views , Author=@Author ,Thumbnail= @Thumbnail , IsShowOnHomePage = @IsShowOnHomePage WHERE Id=@Id ";
             var result = await _session.Connection.ExecuteAsync(sql, post, _session.Transaction);
             if (result > 0)
             {
@@ -135,18 +113,6 @@ namespace server.DataAccess.Repositories
                 return true;
             }
             return false;
-        }
-        public async Task<IReadOnlyList<Post>> SearchPost(PostSearchModel model)
-        {
-            var whereCondition = model.CategoryId == null ? " " : " WHERE CategoryId = @CategoryId ";
-            var query = "Select * From Posts " + whereCondition ;
-
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
-            {
-                connection.Open();
-                var result = await connection.QueryAsync<Post>(query);
-                return result.ToList();
-            }
         }
     }
 }

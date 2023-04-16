@@ -10,7 +10,7 @@ namespace server.DataAccess.Repositories
     public interface IPostLangRepository : IGenericRepository<PostLang>
     {
         public Task<PostLang> GetBySpecificLang(int postId, int languageId);
-        public Task<IReadOnlyList<PostLang>> GetPostId(int postId);
+        public Task<IReadOnlyList<PostLang>> GetByPostId(int postId);
         public Task<PostLang> AddTransactionalAsync(PostLang entity);
         public Task<IReadOnlyList<PostLang>> GetAllBySpecificLang(int languageId);
         public Task<PostLang> UpdateTransactional (PostLang entity);
@@ -39,7 +39,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<PostLang> AddTransactional(PostLang entity)
         {
-            var sql = "INSERT INTO PostLangs (PostId, LanguageId , Title, Body ,ShortDescription) VALUES (@PostId,@LanguageId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO PostLangs (PostId, LanguageId , Title, Body ,ShortDescription,Slug) VALUES (@PostId,@LanguageId , @Title, @Body ,@ShortDescription,@Slug) ; SELECT LAST_INSERT_ID() ";
 
                 var result = await _session.Connection.QuerySingleAsync<int>(sql, entity, _session.Transaction);
                 entity.Id = result;
@@ -49,7 +49,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<PostLang> AddTransactionalAsync(PostLang entity)
         {
-            var sql = "INSERT INTO PostLangs (PostId, LanguageId , Title, Body ,ShortDescription) VALUES (@PostId,@LanguageId , @Title, @Body ,@ShortDescription) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO PostLangs (PostId, LanguageId , Title, Body ,ShortDescription,Slug) VALUES (@PostId,@LanguageId , @Title, @Body ,@ShortDescription,@Slug) ; SELECT LAST_INSERT_ID() ";
             var result = await _session.Connection.QueryFirstOrDefaultAsync<int>(sql, entity, _session.Transaction);
             entity.Id = result;
             return entity;
@@ -121,7 +121,7 @@ namespace server.DataAccess.Repositories
             }
         }
 
-        public async Task<IReadOnlyList<PostLang>> GetPostId(int postId)
+        public async Task<IReadOnlyList<PostLang>> GetByPostId(int postId)
         {
             var query = "SELECT * FROM PostLangs WHERE PostId = @PostId";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
@@ -134,7 +134,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<PostLang> UpdateAsync(PostLang entity)
         {
-            var sql = "UPDATE PostLangs SET Title = @Title, Body=@Body ,ShortDescription=@ShortDescription WHERE Id=@Id ";
+            var sql = "UPDATE PostLangs SET Title = @Title, Body=@Body ,ShortDescription=@ShortDescription , Slug = @Slug WHERE Id=@Id ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
@@ -150,7 +150,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<PostLang> UpdateTransactional(PostLang entity)
         {
-            var sql = "UPDATE PostLangs SET Title = @Title, Body=@Body ,ShortDescription=@ShortDescription WHERE Id=@Id ";
+            var sql = "UPDATE PostLangs SET Title = @Title, Body=@Body ,ShortDescription=@ShortDescription , Slug = @Slug WHERE Id=@Id ";
             var result = await _session.Connection.ExecuteAsync(sql, entity,_session.Transaction);
             if(result > 0)
             {

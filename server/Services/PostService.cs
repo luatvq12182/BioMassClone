@@ -9,9 +9,9 @@ namespace server.Services
 {
     public interface IPostService : IGenericService<Post>
     {
-        Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model);
-        Task<IReadOnlyList<PostModel>> InsertTransactional(IReadOnlyList<PostModel> model);
-        Task<IReadOnlyList<PostModel>> UpDateTransactional(IReadOnlyList<PostModel> model);
+        Task<PaginatedList<PostViewModel>> GetPagedPost(PostSearchModel model);
+        Task<PostModel> InsertTransactional(PostModel model);
+        Task<PostModel> UpDateTransactional(PostModel model);
         Task<bool> DeleteTransactional(int id);
     }
     public class PostService : IPostService
@@ -46,117 +46,71 @@ namespace server.Services
         {
             throw new NotImplementedException();
         }
-        public async Task<PaginatedList<PostModel>> GetPagedPost(PostSearchModel model)
+        public async Task<PaginatedList<PostViewModel>> GetPagedPost(PostSearchModel model)
         {
-            List<PostModel> Items = new List<PostModel>();
+            List<PostViewModel> Items = new List<PostViewModel>();
             int TotalCount;
 
-            if (!string.IsNullOrEmpty(model.Lang))
+            var language = await _unit.Language.GetByCode(model.Lang);
+            if (language != null)
             {
-                var language = await _unit.Language.GetByCode(model.Lang);
-                if (language != null)
+                var postLangs = await _unit.PostLang.GetAllBySpecificLang(language.Id);
+                var postIds = postLangs.Select(p => p.PostId).ToList();
+                foreach (var postLang in postLangs)
                 {
-                    var postLangs = await _unit.PostLang.GetAllBySpecificLang(language.Id);
-                    var posts = await _unit.Post.SearchPost(model);
-                    if (posts != null && posts.Any())
-                    {
-                        foreach (var post in posts)
-                        {
-                            if (postLangs != null && postLangs.Any())
-                            {
-                                foreach (var postLang in postLangs)
-                                {
-                                    if (postLang.PostId == post.Id)
-                                    {
-                                        var postModel = Utilities.MapToPostModel(post, postLang);
-                                        Items.Add(postModel);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    TotalCount = Items.Count;
-                    Items = Items.OrderByDescending(p=>p.CreatedDate).ToList(); 
-                    return new PaginatedList<PostModel>(Items, TotalCount, model.PageNumber, model.Pagesize);
-                }
-                else { return null; }
+                    var post = await _unit.Post.GetByIdAsync(postLang.PostId);
 
-            }
-            else
-            {
-                var posts = await _unit.Post.SearchPost(model);
-                if (posts != null && posts.Any())
-                {
-                    foreach (var post in posts)
-                    {
-                        var postModel = post.MapToModel();
-                        Items.Add(postModel);
-                    }
+                    var postViewModel = Utilities.MapToPostModel(post, postLang);
+                    Items.Add(postViewModel);   
                 }
                 TotalCount = Items.Count;
                 Items = Items.OrderByDescending(p => p.CreatedDate).ToList();
-                return new PaginatedList<PostModel>(Items, TotalCount, model.PageNumber, model.Pagesize);
+                return new PaginatedList<PostViewModel>(Items, TotalCount, model.PageNumber, model.Pagesize);
             }
+            else { return null; }
+
         }
 
-        public async Task<IReadOnlyList<PostModel>> InsertTransactional(IReadOnlyList<PostModel> model)
+        public async Task<PostModel> InsertTransactional(PostModel model)
         {
-            var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
-            if (standardItem != null)
+            var post = new Post { Author = model.Author, CategoryId = model.CategoryId, CreatedDate = DateTime.Now, IsShowOnHomePage = model.IsShowOnHomePage, Thumbnail = model.Thumbnail, Views = 0 };
+
+            var insertedPost = await _unit.Post.AddTransactionalAsync(post);
+            if (model.Items != null && model.Items.Any())
             {
-                standardItem.CreatedDate = DateTime.Now;
-                var insertedPost = await _unit.Post.AddTransactionalAsync(standardItem.MapToEntity());
-                var spescificItems = model.Where(x => x.LanguageId > 0).ToList();
-                if (spescificItems != null && spescificItems.Any())
+                foreach (var item in model.Items)
                 {
-                    foreach (var item in spescificItems)
-                    {
-                        var postLang = item.MapToPostLangEntity();
-                        postLang.PostId = insertedPost.Id;
-                        await _unit.PostLang.AddTransactionalAsync(postLang);
-                    }
-                }
-                if (await _unit.CommitThings())
-                {
-                    return model;
+                    item.PostId = insertedPost.Id;
+                    await _unit.PostLang.AddTransactionalAsync(item);
                 }
             }
-            return null;
-        }
-
-        public async Task<IReadOnlyList<PostModel>> UpDateTransactional(IReadOnlyList<PostModel> model)
-        {
-            var standardItem = model.FirstOrDefault(x => x.LanguageId is null);
-            if (standardItem != null)
+            if (await _unit.CommitThings())
             {
-                await _unit.Post.UpdateTransactionalAsync(standardItem.MapToEntity());
-                var specificItems = model.Where(x => x.LanguageId.HasValue && x.LanguageId.Value > 0).ToList();
-
-                if (specificItems != null && specificItems.Any())
-                {
-                    foreach (var postLang in specificItems)
-                    {
-                        if (postLang.Id == 0)
-                        {
-                            postLang.PostId = standardItem.Id;
-                            await _unit.PostLang.AddTransactionalAsync(postLang.MapToPostLangEntity());
-                        }
-                        else
-                            await _unit.PostLang.UpdateTransactional(postLang.MapToPostLangEntity());
-                    }
-                }
-                if (await _unit.CommitThings())
-                {
-                    return model;
-                }
-                else
-                    return null;
+                return model;
             }
             else
-            {
                 return null;
-            }
+        }
 
+        public async Task<PostModel> UpDateTransactional(PostModel model)
+        {
+            var post = new Post { Id = model.Id, Author = model.Author, CategoryId = model.CategoryId, IsShowOnHomePage = model.IsShowOnHomePage, Thumbnail = model.Thumbnail };
+
+            await _unit.Post.UpdateTransactionalAsync(post);
+
+            if (model.Items != null && model.Items.Any())
+            {
+                foreach (var item in model.Items)
+                {
+                    await _unit.PostLang.UpdateTransactional(item);
+                }
+            }
+            if (await _unit.CommitThings())
+            {
+                return model;
+            }
+            else
+                return null;
         }
 
         public async Task<bool> DeleteTransactional(int id)
@@ -169,6 +123,6 @@ namespace server.Services
                 result = true;
             }
             return result;
-        }     
+        }
     }
 }

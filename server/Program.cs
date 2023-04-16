@@ -10,6 +10,8 @@ using server.Options;
 using Microsoft.OpenApi.Models;
 using server.Services;
 using MySqlConnector;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
