@@ -8,6 +8,6 @@
         public DateTime CreatedDate { get; set; }
         public int Views { get; set; }
         public string? Author { get; set; }
-        public bool IsShowOnHomePage { get; set; }     
+        public bool ShowOnHomePage { get; set; }     
     }
 }

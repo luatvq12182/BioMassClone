@@ -58,7 +58,7 @@ namespace server.Services
 
                 if (model.IsShowOnHomePage.HasValue && model.IsShowOnHomePage.Value)
                 {
-                    posts = posts.Where(x=>x.IsShowOnHomePage).ToList();
+                    posts = posts.Where(x=>x.ShowOnHomePage).ToList();
 
                     foreach(var post in posts)
                     {
@@ -86,7 +86,7 @@ namespace server.Services
 
         public async Task<PostModel> InsertTransactional(PostModel model)
         {
-            var post = new Post { Author = model.Author, CategoryId = model.CategoryId, CreatedDate = DateTime.Now, IsShowOnHomePage = model.IsShowOnHomePage, Thumbnail = model.Thumbnail, Views = 0 };
+            var post = new Post { Author = model.Author, CategoryId = model.CategoryId, CreatedDate = DateTime.Now, ShowOnHomePage = model.IsShowOnHomePage, Thumbnail = model.Thumbnail, Views = 0 };
 
             var insertedPost = await _unit.Post.AddTransactionalAsync(post);
             if (model.Items != null && model.Items.Any())
@@ -107,7 +107,7 @@ namespace server.Services
 
         public async Task<PostModel> UpDateTransactional(PostModel model)
         {
-            var post = new Post { Id = model.Id, Author = model.Author, CategoryId = model.CategoryId, IsShowOnHomePage = model.IsShowOnHomePage, Thumbnail = model.Thumbnail };
+            var post = new Post { Id = model.Id, Author = model.Author, CategoryId = model.CategoryId, ShowOnHomePage = model.IsShowOnHomePage, Thumbnail = model.Thumbnail };
 
             await _unit.Post.UpdateTransactionalAsync(post);
 

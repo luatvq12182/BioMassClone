@@ -71,7 +71,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<Post> UpdateAsync(Post entity)
         {
-            var sql = "UPDATE Posts SET CategoryId = @CategoryId ,Views = @Views , Author=@Author , IsShowOnHomePage = @IsShowOnHomePage WHERE Id=@Id ";
+            var sql = "UPDATE Posts SET CategoryId = @CategoryId ,Views = @Views , Author=@Author , ShowOnHomePage = @ShowOnHomePage WHERE Id=@Id ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
@@ -86,7 +86,7 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Post> AddTransactionalAsync(Post entity)
         {
-            var sql = "INSERT INTO Posts (CategoryId , CreatedDate , Views , Author , IsShowOnHomePage) VALUES (@CategoryId,  @CreatedDate, @Views, @Author , @IsShowOnHomePage) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Posts (CategoryId , CreatedDate , Views , Author , ShowOnHomePage) VALUES (@CategoryId,  @CreatedDate, @Views, @Author , @ShowOnHomePage) ; SELECT LAST_INSERT_ID() ";
 
             var result = await _session.Connection.QueryFirstOrDefaultAsync<int>(sql, entity, _session.Transaction);
             entity.Id = result;
@@ -95,7 +95,7 @@ namespace server.DataAccess.Repositories
 
         public async Task<Post> UpdateTransactionalAsync(Post post)
         {
-            var sql = "UPDATE Posts SET CategoryId = @CategoryId ,Views = @Views , Author=@Author ,Thumbnail= @Thumbnail , IsShowOnHomePage = @IsShowOnHomePage WHERE Id=@Id ";
+            var sql = "UPDATE Posts SET CategoryId = @CategoryId ,Views = @Views , Author=@Author ,Thumbnail= @Thumbnail , ShowOnHomePage = @ShowOnHomePage WHERE Id=@Id ";
             var result = await _session.Connection.ExecuteAsync(sql, post, _session.Transaction);
             if (result > 0)
             {

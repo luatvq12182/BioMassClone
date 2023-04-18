@@ -89,7 +89,7 @@ namespace server.Helper
                 CreatedDate = post.CreatedDate,
                 Views = post.Views,
                 Slug = postLang.Slug,
-                IsShowOnHomePage = post.IsShowOnHomePage
+                IsShowOnHomePage = post.ShowOnHomePage
             };
         }
     }
