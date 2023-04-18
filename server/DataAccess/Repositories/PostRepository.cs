@@ -26,7 +26,7 @@ namespace server.DataAccess.Repositories
         }
         public async Task<Post> AddAsync(Post entity)
         {
-            var sql = "INSERT INTO Posts (CategoryId,CreatedDate , Views , Author , IsShowOnHomePage) VALUES (@CategoryId, @CreatedDate, @Views, @Author,@IsShowOnHomePage) ; SELECT LAST_INSERT_ID() ";
+            var sql = "INSERT INTO Posts (CategoryId,CreatedDate , Views , Author , ShowOnHomePage) VALUES (@CategoryId, @CreatedDate, @Views, @Author,@ShowOnHomePage) ; SELECT LAST_INSERT_ID() ";
             using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
