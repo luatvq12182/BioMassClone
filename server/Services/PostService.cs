@@ -54,34 +54,16 @@ namespace server.Services
             var language = await _unit.Language.GetByCode(model.Lang);
             if (language != null)
             {
-                var posts = await _unit.Post.GetAllAsync();
-
-                if (model.IsShowOnHomePage.HasValue && model.IsShowOnHomePage.Value)
+                var posts = await _unit.Post.SearchPost(model.IsShowOnHomePage,model.CategoryId);
+                foreach(var post in posts)
                 {
-                    posts = posts.Where(x=>x.ShowOnHomePage).ToList();
-
-                    foreach(var post in posts)
+                    var postLang = await _unit.PostLang.GetBySpecificLang(post.Id,language.Id);
+                    if (postLang != null)
                     {
-                        var postLang = await _unit.PostLang.GetBySpecificLang(post.Id,language.Id);
-                        if (postLang != null)
-                        {
-                            var postViewModel = Utilities.MapToPostModel(post, postLang);
-                            Items.Add(postViewModel);
-                        }
+                        var postViewModel = Utilities.MapToPostModel(post, postLang);
+                        Items.Add(postViewModel);
                     }
-                }
-                else
-                {
-                    foreach (var post in posts)
-                    {
-                        var postLang = await _unit.PostLang.GetBySpecificLang(post.Id, language.Id);
-                        if(postLang != null)
-                        {
-                            var postViewModel = Utilities.MapToPostModel(post, postLang);
-                            Items.Add(postViewModel);
-                        }
-                    }
-                }
+                }               
                 TotalCount = Items.Count;
                 Items = Items.OrderByDescending(p => p.CreatedDate).ToList();
                 return new PaginatedList<PostViewModel>(Items, TotalCount, model.PageNumber, model.Pagesize);

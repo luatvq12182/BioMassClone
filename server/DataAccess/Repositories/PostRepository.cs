@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySqlConnector;
+using MySqlX.XDevAPI.Common;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
@@ -14,6 +15,7 @@ namespace server.DataAccess.Repositories
         public Task<Post> AddTransactionalAsync(Post post);
         public Task<Post> UpdateTransactionalAsync(Post post);
         public Task<bool> DeleteTransactionalAsync(int id);
+        public Task<IReadOnlyList<Post>> SearchPost(bool? showOnHomePage , int? categoryId);
     }
     public class PostRepository : IPostRepository
     {
@@ -113,6 +115,28 @@ namespace server.DataAccess.Repositories
                 return true;
             }
             return false;
+        }
+
+        public async Task<IReadOnlyList<Post>> SearchPost(bool? showOnHomePage, int? categoryId)
+        {
+            var whereStatement = " WHERE ";
+            if(categoryId.HasValue && categoryId > 0)
+            {
+                whereStatement += " CategoryId = @CategoryId AND ";
+            }
+            if (showOnHomePage.HasValue && showOnHomePage.Value)
+            {
+                whereStatement += " ShowOnHomePage = 1 AND ";
+            }
+            whereStatement = whereStatement.Substring(0, whereStatement.Length - 4);
+
+            var query = "SELECT * FROM Posts " + whereStatement;
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                var result = await connection.QueryAsync<Post>(query , new {CategoryId = categoryId, ShowOnHomePage = showOnHomePage});
+                return result.ToList();
+            }
         }
     }
 }
