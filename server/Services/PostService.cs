@@ -54,14 +54,27 @@ namespace server.Services
             var language = await _unit.Language.GetByCode(model.Lang);
             if (language != null)
             {
-                var postLangs = await _unit.PostLang.GetAllBySpecificLang(language.Id);
-                var postIds = postLangs.Select(p => p.PostId).ToList();
-                foreach (var postLang in postLangs)
-                {
-                    var post = await _unit.Post.GetByIdAsync(postLang.PostId);
+                var posts = await _unit.Post.GetAllAsync();
 
-                    var postViewModel = Utilities.MapToPostModel(post, postLang);
-                    Items.Add(postViewModel);   
+                if (model.IsShowOnHomePage.HasValue && model.IsShowOnHomePage.Value)
+                {
+                    posts = posts.Where(x=>x.IsShowOnHomePage).ToList();
+
+                    foreach(var post in posts)
+                    {
+                        var postLang = await _unit.PostLang.GetBySpecificLang(post.Id,language.Id);
+                        var postViewModel = Utilities.MapToPostModel(post, postLang);
+                        Items.Add(postViewModel);
+                    }
+                }
+                else
+                {
+                    foreach (var post in posts)
+                    {
+                        var postLang = await _unit.PostLang.GetBySpecificLang(post.Id, language.Id);
+                        var postViewModel = Utilities.MapToPostModel(post, postLang);
+                        Items.Add(postViewModel);
+                    }
                 }
                 TotalCount = Items.Count;
                 Items = Items.OrderByDescending(p => p.CreatedDate).ToList();

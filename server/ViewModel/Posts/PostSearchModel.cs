@@ -6,5 +6,6 @@ namespace server.ViewModel.Posts
     {
         public string Lang { get; set; }
         public int? CategoryId { get; set; }
+        public bool? IsShowOnHomePage { get; set; }
     }
 }
