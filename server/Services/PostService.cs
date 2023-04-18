@@ -63,8 +63,11 @@ namespace server.Services
                     foreach(var post in posts)
                     {
                         var postLang = await _unit.PostLang.GetBySpecificLang(post.Id,language.Id);
-                        var postViewModel = Utilities.MapToPostModel(post, postLang);
-                        Items.Add(postViewModel);
+                        if (postLang != null)
+                        {
+                            var postViewModel = Utilities.MapToPostModel(post, postLang);
+                            Items.Add(postViewModel);
+                        }
                     }
                 }
                 else
@@ -72,8 +75,11 @@ namespace server.Services
                     foreach (var post in posts)
                     {
                         var postLang = await _unit.PostLang.GetBySpecificLang(post.Id, language.Id);
-                        var postViewModel = Utilities.MapToPostModel(post, postLang);
-                        Items.Add(postViewModel);
+                        if(postLang != null)
+                        {
+                            var postViewModel = Utilities.MapToPostModel(post, postLang);
+                            Items.Add(postViewModel);
+                        }
                     }
                 }
                 TotalCount = Items.Count;
