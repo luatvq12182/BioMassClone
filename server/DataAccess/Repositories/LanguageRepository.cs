@@ -72,19 +72,10 @@ namespace server.DataAccess.Repositories
         public async Task<Language> GetByCode(string code)
         {
             var query = " SELECT * FROM Languages WHERE Code = @Code ";
-
-
-            var cs = new DbConnectionStringBuilder();
-            cs["SERVER"] = "103.63.109.180,3306";
-            cs["DATABASE"] = "thgreenway";
-            cs["UID"] = "root";
-            cs["PASSWORD"] = "Dattuan@123";
-            var connectionString = cs.ConnectionString;
-
-            using (var connection = new MySqlConnection(connectionString))
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
             {
                 connection.Open();
-                var result = await connection.QueryFirstOrDefaultAsync<Language>(query, new { Code = code});
+                var result = await connection.QueryFirstOrDefaultAsync<Language>(query, new { Code = code });
                 return result;
             }
         }
