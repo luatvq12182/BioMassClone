@@ -75,7 +75,7 @@ namespace server.DataAccess.Repositories
 
 
             var cs = new DbConnectionStringBuilder();
-            cs["SERVER"] = "server=103.63.109.180,3306";
+            cs["SERVER"] = "103.63.109.180,3306";
             cs["DATABASE"] = "thgreenway";
             cs["UID"] = "root";
             cs["PASSWORD"] = "Dattuan@123";
