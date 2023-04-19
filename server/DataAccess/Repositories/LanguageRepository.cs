@@ -1,9 +1,11 @@
 ﻿using Dapper;
+using Microsoft.EntityFrameworkCore.Storage;
 using MySql.Data.MySqlClient;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
 using server.DataAccess.Persistence;
 using server.ViewModel.Languages;
+using System.Data.Common;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace server.DataAccess.Repositories
@@ -70,7 +72,16 @@ namespace server.DataAccess.Repositories
         public async Task<Language> GetByCode(string code)
         {
             var query = " SELECT * FROM Languages WHERE Code = @Code ";
-            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+
+
+            var cs = new DbConnectionStringBuilder();
+            cs["SERVER"] = "server=103.63.109.180,3306";
+            cs["DATABASE"] = "thgreenway";
+            cs["UID"] = "root";
+            cs["PASSWORD"] = "Dattuan@123";
+            var connectionString = cs.ConnectionString;
+
+            using (var connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
                 var result = await connection.QueryFirstOrDefaultAsync<Language>(query, new { Code = code});
