@@ -9,7 +9,7 @@ namespace server.Services
 {
     public interface IPostService : IGenericService<Post>
     {
-        Task<PaginatedList<PostViewModel>> GetPagedPost(PostSearchModel model);
+        Task<PaginatedList<PostViewModel>> GetPagedPost(int languageId, int? categoryId, bool? showOnHomePage, int pageNumber = 1, int pageSize = 10);
         Task<PostModel> InsertTransactional(PostModel model);
         Task<PostModel> UpDateTransactional(PostModel model);
         Task<bool> DeleteTransactional(int id);
@@ -46,31 +46,10 @@ namespace server.Services
         {
             throw new NotImplementedException();
         }
-        public async Task<PaginatedList<PostViewModel>> GetPagedPost(PostSearchModel model)
+        public async Task<PaginatedList<PostViewModel>> GetPagedPost(int languageId, int? categoryId, bool? showOnHomePage, int pageNumber = 1, int pageSize = 10)
         {
-            List<PostViewModel> Items = new List<PostViewModel>();
-            int TotalCount;
-
-            var language = await _unit.Language.GetByCode(model.Lang);
-            if (language != null)
-            {
-                var posts = await _unit.Post.SearchPost(model.IsShowOnHomePage,model.CategoryId);
-                foreach(var post in posts)
-                {
-                    var postLang = await _unit.PostLang.GetBySpecificLang(post.Id,language.Id);
-                    if (postLang != null)
-                    {
-                        var postViewModel = Utilities.MapToPostModel(post, postLang);
-                        Items.Add(postViewModel);
-                    }
-                }               
-                TotalCount = Items.Count;
-                Items = Items.OrderByDescending(p => p.CreatedDate).ToList();
-                return new PaginatedList<PostViewModel>(Items, TotalCount, model.PageNumber, model.Pagesize);
-            }
-            else { return null; }
-
-        }
+            return await _unit.Post.SearchPost(languageId,categoryId,showOnHomePage,pageNumber,pageSize);
+        } 
 
         public async Task<PostModel> InsertTransactional(PostModel model)
         {

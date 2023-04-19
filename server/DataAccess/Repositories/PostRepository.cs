@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MySqlConnector;
+using Mysqlx.Crud;
 using MySqlX.XDevAPI.Common;
 using server.DataAccess.Common;
 using server.DataAccess.Entities;
@@ -15,7 +16,7 @@ namespace server.DataAccess.Repositories
         public Task<Post> AddTransactionalAsync(Post post);
         public Task<Post> UpdateTransactionalAsync(Post post);
         public Task<bool> DeleteTransactionalAsync(int id);
-        public Task<IReadOnlyList<Post>> SearchPost(bool? showOnHomePage , int? categoryId);
+        public Task<PaginatedList<PostViewModel>> SearchPost(int languageId, int? categoryId, bool? showOnHomePage, int pageNumber = 1, int pageSize = 10);
     }
     public class PostRepository : IPostRepository
     {
@@ -137,6 +138,51 @@ namespace server.DataAccess.Repositories
                 var result = await connection.QueryAsync<Post>(query , new {CategoryId = categoryId, ShowOnHomePage = showOnHomePage});
                 return result.ToList();
             }
+        }
+        public async Task<PaginatedList<PostViewModel>> SearchPost(int languageId , int? categoryId , bool? showOnHomePage, int pageNumber = 1 , int pageSize = 10)
+        {
+            var whereStatement = " WHERE postLang.LanguageId = @LanguageId AND ";
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                whereStatement += " post.CategoryId = @CategoryId AND ";
+            }
+            if (showOnHomePage.HasValue && showOnHomePage.Value)
+            {
+                whereStatement += " post.ShowOnHomePage = 1 AND ";
+            }
+            whereStatement = whereStatement.Substring(0, whereStatement.Length - 4);
+
+            List<PostViewModel> items;
+
+            var offSet = pageSize * (pageNumber - 1);
+            int totalCount;
+
+            var query = @"SELECT postLang.Id AS Id , 
+                        post.Id AS PostId , 
+                        post.CategoryId AS CategoryId , 
+                        post.Thumbnail AS Thumbnail , 
+                        post.CreatedDate AS CreatedDate , 
+                        post.Views AS Views ,
+                        post.Author AS Author , 
+                        post.ShowOnHomePage AS ShowOnHomePage , 
+                        postLang.LanguageId as LanguageId , 
+                        postLang.Title AS Title , postLang.Body AS Body , 
+                        postLang.ShortDescription AS ShortDescription , 
+                        postLang.Slug AS Slug 
+                        FROM Posts post LEFT JOIN PostLangs postLang On post.Id = postLang.PostId " + whereStatement + " ORDER BY post.CreatedDate " + 
+                        @" LIMIT @PageSize OFFSET @OffSet ;
+                        SELECT COUNT(*) FROM Posts post LEFT JOIN PostLangs postLang On post.Id = postLang.PostId " + whereStatement ;
+
+            using (var connection = new MySqlConnection(_configuration.GetConnectionString("MySqlConn")))
+            {
+                connection.Open();
+                using (var multi = await connection.QueryMultipleAsync(query, new {LanguageId = languageId , PageSize = pageSize , OffSet = offSet, CategoryId = categoryId }))
+                {
+                    items = multi.Read<PostViewModel>().ToList();
+                    totalCount = multi.ReadFirst<int>();
+                }
+            }
+            return new PaginatedList<PostViewModel>(items, totalCount, pageNumber, pageSize);
         }
     }
 }

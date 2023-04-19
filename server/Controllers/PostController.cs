@@ -26,12 +26,17 @@ namespace server.Controllers
         [HttpGet]
         public async Task<ActionResult<PostModel>> GetAll([FromQuery] PostSearchModel model)
         {
-            var data = await _postService.GetPagedPost(model);
-            if (data == null)
+            var language = await _languageService.GetByCode(model.Lang);
+            if (language == null)
             {
-                return BadRequest("Wrong lang code ");
+                return BadRequest("No specific lang with the code");
             }
-            return Ok(data);
+            else
+            {
+                var data = await _postService.GetPagedPost(language.Id,model.CategoryId,model.IsShowOnHomePage,model.PageNumber,model.Pagesize);
+                return Ok(data);
+            }
+            
         }
 
         [HttpGet("{id}")]
